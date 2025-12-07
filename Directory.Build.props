@@ -7,12 +7,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     
     <!-- Package information -->
-    <Authors>Cover-Bouncer Contributors</Authors>
-    <Company>Cover-Bouncer</Company>
-    <Copyright>Copyright © 2025 Cover-Bouncer Contributors</Copyright>
+    <Authors>DeusBlu</Authors>
+    <Company>DeusBlu</Company>
+    <Copyright>Copyright © 2025 DeusBlu</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/cover-bouncer/cover-bouncer</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/cover-bouncer/cover-bouncer</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/DeusBlu/cover-bouncer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy</PackageTags>
     <Description>Profile-based code coverage enforcement for .NET projects</Description>
