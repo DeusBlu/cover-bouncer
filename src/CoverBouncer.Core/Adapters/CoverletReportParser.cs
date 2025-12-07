@@ -44,52 +44,64 @@ public sealed class CoverletReportParser
             AllowTrailingCommas = true
         });
 
-        var files = new Dictionary<string, FileCoverage>();
+        var fileData = new Dictionary<string, (int total, int covered)>();
 
-        // Coverlet format: root object has module keys
+        // Coverlet format: { "Module.dll": { "FilePath": { "ClassName": { "Method": { "Lines": {...} } } } } }
         foreach (var moduleProperty in doc.RootElement.EnumerateObject())
         {
-            if (!moduleProperty.Value.TryGetProperty("Documents", out var documents))
+            // Each module contains files
+            foreach (var fileProperty in moduleProperty.Value.EnumerateObject())
             {
-                continue;
-            }
-
-            // Each document is a file
-            foreach (var docProperty in documents.EnumerateObject())
-            {
-                var filePath = docProperty.Name;
-                var docData = docProperty.Value;
-
-                var totalLines = 0;
-                var coveredLines = 0;
-
-                // Lines object contains line numbers and hit counts
-                if (docData.TryGetProperty("Lines", out var lines))
+                var filePath = fileProperty.Name;
+                
+                // Each file contains classes
+                foreach (var classProperty in fileProperty.Value.EnumerateObject())
                 {
-                    foreach (var line in lines.EnumerateObject())
+                    // Each class contains methods
+                    foreach (var methodProperty in classProperty.Value.EnumerateObject())
                     {
-                        totalLines++;
-                        var hitCount = line.Value.GetInt32();
-                        if (hitCount > 0)
+                        if (!methodProperty.Value.TryGetProperty("Lines", out var lines))
                         {
-                            coveredLines++;
+                            continue;
                         }
+
+                        // Aggregate line coverage at file level
+                        if (!fileData.ContainsKey(filePath))
+                        {
+                            fileData[filePath] = (0, 0);
+                        }
+
+                        var (totalLines, coveredLines) = fileData[filePath];
+
+                        foreach (var line in lines.EnumerateObject())
+                        {
+                            totalLines++;
+                            var hitCount = line.Value.GetInt32();
+                            if (hitCount > 0)
+                            {
+                                coveredLines++;
+                            }
+                        }
+
+                        fileData[filePath] = (totalLines, coveredLines);
                     }
                 }
-
-                // Calculate line rate
-                var lineRate = totalLines > 0 
-                    ? (decimal)coveredLines / totalLines 
-                    : 0m;
-
-                files[filePath] = new FileCoverage
-                {
-                    FilePath = filePath,
-                    LineRate = lineRate,
-                    TotalLines = totalLines,
-                    CoveredLines = coveredLines
-                };
             }
+        }
+
+        // Convert to FileCoverage objects
+        var files = new Dictionary<string, FileCoverage>();
+        foreach (var (filePath, (totalLines, coveredLines)) in fileData)
+        {
+            var lineRate = totalLines > 0 ? (decimal)coveredLines / totalLines : 0m;
+
+            files[filePath] = new FileCoverage
+            {
+                FilePath = filePath,
+                LineRate = lineRate,
+                TotalLines = totalLines,
+                CoveredLines = coveredLines
+            };
         }
 
         return new CoverageReport
