@@ -131,11 +131,12 @@ public class PolicyConfigurationTests
     {
         var config = new PolicyConfiguration
         {
+            CoverageReportPath = "coverage.json",
             DefaultProfile = "Standard",
             Profiles = new Dictionary<string, ProfileThresholds>
             {
                 ["Standard"] = new() { MinLine = 0.70m },
-                ["Critical"] = new() { MinLine = 1.00m, MinBranch = 1.00m },
+                ["Critical"] = new() { MinLine = 1.00m },
                 ["Dto"] = new() { MinLine = 0.00m }
             }
         };

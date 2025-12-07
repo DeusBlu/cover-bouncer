@@ -2,61 +2,42 @@ namespace CoverBouncer.Core.Models;
 
 /// <summary>
 /// Represents a coverage policy violation for a single file.
+/// MVP: Line coverage only.
 /// </summary>
 public sealed class CoverageViolation
 {
     /// <summary>
     /// Path to the file that violated the policy.
     /// </summary>
-    public required string FilePath { get; init; }
+    public string FilePath { get; set; } = null!;
 
     /// <summary>
     /// Profile that was violated.
     /// </summary>
-    public required string ProfileName { get; init; }
+    public string ProfileName { get; set; } = null!;
 
     /// <summary>
-    /// Type of violation (line or branch coverage).
+    /// Type of violation (line coverage).
     /// </summary>
-    public required ViolationType ViolationType { get; init; }
+    public ViolationType ViolationType { get; set; }
 
     /// <summary>
     /// Required coverage threshold (0.0 to 1.0).
     /// </summary>
-    public required decimal RequiredCoverage { get; init; }
+    public decimal RequiredCoverage { get; set; }
 
     /// <summary>
     /// Actual coverage achieved (0.0 to 1.0).
     /// </summary>
-    public required decimal ActualCoverage { get; init; }
-
-    /// <summary>
-    /// Total number of coverable items (lines or branches).
-    /// </summary>
-    public required int TotalItems { get; init; }
-
-    /// <summary>
-    /// Number of covered items (lines or branches).
-    /// </summary>
-    public required int CoveredItems { get; init; }
-
-    /// <summary>
-    /// Number of items missing coverage.
-    /// </summary>
-    public int MissingItems => TotalItems - CoveredItems;
+    public decimal ActualCoverage { get; set; }
 
     /// <summary>
     /// Gets a formatted message describing the violation.
     /// </summary>
     public string GetMessage()
     {
-        var coverageType = ViolationType == ViolationType.LineCoverageTooLow ? "line" : "branch";
-        var actualPercent = (ActualCoverage * 100).ToString("F1");
-        var requiredPercent = (RequiredCoverage * 100).ToString("F1");
-        
         return $"{FilePath} ({ProfileName}): " +
-               $"{coverageType} coverage is {actualPercent}%, required {requiredPercent}% " +
-               $"({CoveredItems}/{TotalItems} {coverageType}s covered, {MissingItems} missing)";
+               $"line coverage is {ActualCoverage:P1}, required {RequiredCoverage:P0}";
     }
 
     /// <summary>
@@ -64,10 +45,6 @@ public sealed class CoverageViolation
     /// </summary>
     public string GetShortMessage()
     {
-        var coverageType = ViolationType == ViolationType.LineCoverageTooLow ? "line" : "branch";
-        var actualPercent = (ActualCoverage * 100).ToString("F1");
-        var requiredPercent = (RequiredCoverage * 100).ToString("F1");
-        
-        return $"{FilePath}: {coverageType} {actualPercent}% < {requiredPercent}%";
+        return $"{ActualCoverage:P1} < {RequiredCoverage:P0}";
     }
 }

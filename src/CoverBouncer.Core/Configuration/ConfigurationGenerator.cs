@@ -16,6 +16,7 @@ public static class ConfigurationGenerator
 
     /// <summary>
     /// Generates a basic default configuration.
+    /// MVP: Line coverage only with built-in profiles.
     /// </summary>
     public static PolicyConfiguration GenerateBasic()
     {
@@ -25,10 +26,10 @@ public static class ConfigurationGenerator
             DefaultProfile = "Standard",
             Profiles = new Dictionary<string, ProfileThresholds>
             {
-                ["Standard"] = new() { MinLine = 0.70m, MinBranch = 0.60m },
-                ["BusinessLogic"] = new() { MinLine = 0.90m, MinBranch = 0.80m },
-                ["Critical"] = new() { MinLine = 1.00m, MinBranch = 1.00m },
-                ["Dto"] = new() { MinLine = 0.00m, MinBranch = 0.00m }
+                ["Critical"] = new() { MinLine = 1.0m },
+                ["BusinessLogic"] = new() { MinLine = 0.8m },
+                ["Standard"] = new() { MinLine = 0.6m },
+                ["Dto"] = new() { MinLine = 0.0m }
             }
         };
     }
@@ -41,13 +42,13 @@ public static class ConfigurationGenerator
         return new PolicyConfiguration
         {
             CoverageReportPath = "TestResults/coverage.json",
-            DefaultProfile = "High",
+            DefaultProfile = "Standard",
             Profiles = new Dictionary<string, ProfileThresholds>
             {
-                ["High"] = new() { MinLine = 0.90m, MinBranch = 0.85m },
-                ["Critical"] = new() { MinLine = 1.00m, MinBranch = 1.00m },
-                ["Moderate"] = new() { MinLine = 0.75m, MinBranch = 0.70m },
-                ["Low"] = new() { MinLine = 0.50m, MinBranch = 0.40m }
+                ["Critical"] = new() { MinLine = 1.0m },
+                ["BusinessLogic"] = new() { MinLine = 0.9m },
+                ["Standard"] = new() { MinLine = 0.8m },
+                ["Dto"] = new() { MinLine = 0.0m }
             }
         };
     }
@@ -60,13 +61,13 @@ public static class ConfigurationGenerator
         return new PolicyConfiguration
         {
             CoverageReportPath = "TestResults/coverage.json",
-            DefaultProfile = "Low",
+            DefaultProfile = "Standard",
             Profiles = new Dictionary<string, ProfileThresholds>
             {
-                ["Low"] = new() { MinLine = 0.50m },
-                ["Moderate"] = new() { MinLine = 0.70m },
-                ["Important"] = new() { MinLine = 0.80m, MinBranch = 0.70m },
-                ["Critical"] = new() { MinLine = 1.00m, MinBranch = 1.00m }
+                ["Critical"] = new() { MinLine = 0.8m },
+                ["BusinessLogic"] = new() { MinLine = 0.6m },
+                ["Standard"] = new() { MinLine = 0.4m },
+                ["Dto"] = new() { MinLine = 0.0m }
             }
         };
     }
