@@ -16,8 +16,15 @@
   </PropertyGroup>
 
   <!-- Load the task assembly -->
+  <PropertyGroup>
+    <!-- When used as NuGet package, DLL is in lib folder relative to this file -->
+    <!-- When used as project reference with explicit Import, use the output directory -->
+    <CoverBouncerTaskAssembly Condition="'$(CoverBouncerTaskAssembly)' == '' AND Exists('$(MSBuildThisFileDirectory)../lib/net8.0/CoverBouncer.MSBuild.dll')">$(MSBuildThisFileDirectory)../lib/net8.0/CoverBouncer.MSBuild.dll</CoverBouncerTaskAssembly>
+    <CoverBouncerTaskAssembly Condition="'$(CoverBouncerTaskAssembly)' == ''">$(MSBuildThisFileDirectory)../bin/$(Configuration)/net8.0/CoverBouncer.MSBuild.dll</CoverBouncerTaskAssembly>
+  </PropertyGroup>
+  
   <UsingTask TaskName="CoverBouncer.MSBuild.VerifyCoverageTask" 
-             AssemblyFile="$(MSBuildThisFileDirectory)../lib/net8.0/CoverBouncer.MSBuild.dll" />
+             AssemblyFile="$(CoverBouncerTaskAssembly)" />
 
   <!-- Target: Ensure config exists before running tests -->
   <Target Name="CoverBouncerEnsureConfig" 

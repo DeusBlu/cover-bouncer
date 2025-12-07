@@ -25,5 +25,5 @@ public class CalculatorTests
         Assert.Equal(6, calc.Multiply(2, 3));
     }
 
-    // Divide is still NOT tested - should bring us to ~64% coverage
+    // Divide is NOT tested - brings us to ~64% coverage (passes 60% Standard profile)
 }

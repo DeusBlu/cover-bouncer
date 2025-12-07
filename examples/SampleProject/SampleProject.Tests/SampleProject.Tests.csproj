@@ -7,10 +7,26 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
+    
+    <!-- Enable CoverBouncer automatic verification -->
+    <EnableCoverBouncer>true</EnableCoverBouncer>
+    <CoverBouncerConfigFile>../coverbouncer.json</CoverBouncerConfigFile>
+    <CoverBouncerCoverageReport>../TestResults/coverage.json</CoverBouncerCoverageReport>
+    
+    <!-- Configure Coverlet to output JSON format -->
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>json</CoverletOutputFormat>
+    <CoverletOutput>$(MSBuildProjectDirectory)/../TestResults/coverage.json</CoverletOutput>
+    <!-- Only collect coverage on SampleProject, not CoverBouncer assemblies -->
+    <Include>[SampleProject]*</Include>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -25,6 +41,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SampleProject\SampleProject.csproj" />
+    <ProjectReference Include="..\..\..\src\CoverBouncer.MSBuild\CoverBouncer.MSBuild.csproj" />
   </ItemGroup>
+
+  <!-- Import CoverBouncer targets when using project reference -->
+  <Import Project="..\..\..\src\CoverBouncer.MSBuild\build\CoverBouncer.targets" />
 
 </Project>
