@@ -9,20 +9,20 @@
 
 ### Repository & Infrastructure
 - [x] Git repository initialized
-- [x] Solution structure created (`CoveragePolicy.sln`)
+- [x] Solution structure created (`CoverBouncer.sln`)
 - [x] Directory.Build.props configured with common settings
 - [x] .gitignore configured for .NET projects
 - [x] MIT License added
 - [x] Initial commit created
 
 ### Project Structure
-- [x] `src/CoveragePolicy.Core` - Core policy engine library
-- [x] `src/CoveragePolicy.Coverlet` - Coverlet adapter library
-- [x] `src/CoveragePolicy.CLI` - CLI console application
-- [x] `src/CoveragePolicy.MSBuild` - MSBuild integration library
-- [x] `tests/CoveragePolicy.Core.Tests` - Core unit tests
-- [x] `tests/CoveragePolicy.Coverlet.Tests` - Coverlet adapter tests
-- [x] `tests/CoveragePolicy.Integration.Tests` - Integration tests
+- [x] `src/CoverBouncer.Core` - Core policy engine library
+- [x] `src/CoverBouncer.Coverlet` - Coverlet adapter library
+- [x] `src/CoverBouncer.CLI` - CLI console application
+- [x] `src/CoverBouncer.MSBuild` - MSBuild integration library
+- [x] `tests/CoverBouncer.Core.Tests` - Core unit tests
+- [x] `tests/CoverBouncer.Coverlet.Tests` - Coverlet adapter tests
+- [x] `tests/CoverBouncer.Integration.Tests` - Integration tests
 
 ### Documentation
 - [x] README.md with project overview
@@ -44,7 +44,7 @@ Build the foundational components that make Cover-Bouncer work.
 
 ### Tasks Breakdown
 
-#### 1. CoveragePolicy.Core - Policy Models & Configuration (Priority: High)
+#### 1. CoverBouncer.Core - Policy Models & Configuration (Priority: High)
 
 **Models to Create:**
 - [ ] `PolicyConfiguration.cs` - Configuration model
@@ -82,7 +82,7 @@ Build the foundational components that make Cover-Bouncer work.
 - [ ] Schema validation
 - [ ] Default config generation
 
-#### 2. CoveragePolicy.Core - Policy Engine (Priority: High)
+#### 2. CoverBouncer.Core - Policy Engine (Priority: High)
 
 **Core Logic:**
 - [ ] `PolicyEngine.cs` - Main validation logic
@@ -96,7 +96,7 @@ Build the foundational components that make Cover-Bouncer work.
   - Apply default profile to untagged files
   - Handle tag parsing errors
 
-#### 3. CoveragePolicy.Coverlet - Adapter (Priority: High)
+#### 3. CoverBouncer.Coverlet - Adapter (Priority: High)
 
 **Coverlet Integration:**
 - [ ] `CoverletReportParser.cs` - Parse Coverlet JSON
@@ -143,7 +143,7 @@ Build the foundational components that make Cover-Bouncer work.
 // [CoverageProfile("BusinessLogic")]
 ```
 
-#### 5. CoveragePolicy.CLI - Basic Commands (Priority: High)
+#### 5. CoverBouncer.CLI - Basic Commands (Priority: High)
 
 **CLI Structure:**
 - [ ] Command-line argument parsing (use `System.CommandLine`)
@@ -307,7 +307,7 @@ dotnet test
 dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=json
 
 # Run specific test project
-dotnet test tests/CoveragePolicy.Core.Tests
+dotnet test tests/CoverBouncer.Core.Tests
 
 # Clean solution
 dotnet clean
@@ -316,7 +316,7 @@ dotnet clean
 dotnet restore
 
 # Add package to project
-dotnet add src/CoveragePolicy.CLI package System.CommandLine
+dotnet add src/CoverBouncer.CLI package System.CommandLine
 
 # Create new test class
 dotnet new xunit -n MyNewTests -o tests/MyNewTests
@@ -361,4 +361,4 @@ dotnet new xunit -n MyNewTests -o tests/MyNewTests
 
 **Ready to start coding!** 🚀
 
-**Next Action:** Begin implementing `PolicyConfiguration.cs` in `CoveragePolicy.Core`
+**Next Action:** Begin implementing `PolicyConfiguration.cs` in `CoverBouncer.Core`

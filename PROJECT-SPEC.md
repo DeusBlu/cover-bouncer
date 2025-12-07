@@ -40,7 +40,7 @@ Cover-Bouncer enables profile-based coverage policies:
 
 ### Three-Layer Design
 
-#### 1. Core Engine (`CoveragePolicy.Core`)
+#### 1. Core Engine (`CoverBouncer.Core`)
 **Pure logic library with zero external dependencies**
 
 **Inputs:**
@@ -60,7 +60,7 @@ Cover-Bouncer enables profile-based coverage policies:
 #### 2. Adapters
 **Bridge between external tools and core engine**
 
-**CoveragePolicy.Coverlet:**
+**CoverBouncer.Coverlet:**
 - Parses Coverlet JSON output
 - Converts to normalized coverage model
 - Handles Coverlet-specific quirks
@@ -74,18 +74,18 @@ Cover-Bouncer enables profile-based coverage policies:
 #### 3. Frontends
 **User-facing components**
 
-**CoveragePolicy.CLI:**
+**CoverBouncer.CLI:**
 - Dotnet global/local tool
 - Commands: `init`, `verify`, `report`
 - Exit codes for CI integration
 
-**CoveragePolicy.MSBuild:**
+**CoverBouncer.MSBuild:**
 - NuGet package with MSBuild targets
 - Auto-runs after `dotnet test`
 - Configurable via MSBuild properties
 - Main user-facing package
 
-**CoveragePolicy.Analyzers (Future):**
+**CoverBouncer.Analyzers (Future):**
 - Roslyn analyzer
 - IDE warnings for missing/incorrect tags
 - Quick fixes for common issues
@@ -98,7 +98,7 @@ Cover-Bouncer enables profile-based coverage policies:
 
 #### Step 1: Install Package
 ```bash
-dotnet add MyApp.Tests package CoveragePolicy.MSBuild
+dotnet add MyApp.Tests package CoverBouncer.MSBuild
 ```
 
 #### Step 2: Initialize Config
@@ -139,7 +139,7 @@ Add to `Directory.Build.props` or test `.csproj`:
   <CollectCoverage>true</CollectCoverage>
   <CoverletOutput>$(MSBuildProjectDirectory)/TestResults/coverage.json</CoverletOutput>
   <CoverletOutputFormat>json</CoverletOutputFormat>
-  <EnableCoveragePolicy>true</EnableCoveragePolicy>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
 </PropertyGroup>
 ```
 
@@ -238,16 +238,16 @@ Users can override via MSBuild properties:
 ```xml
 <PropertyGroup>
   <!-- Enable/disable policy enforcement -->
-  <EnableCoveragePolicy>true</EnableCoveragePolicy>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
   
   <!-- Path to config file -->
-  <CoveragePolicyConfigFile>$(SolutionDir)coverage-policy.json</CoveragePolicyConfigFile>
+  <CoverBouncerConfigFile>$(SolutionDir)coverage-policy.json</CoverBouncerConfigFile>
   
   <!-- Fail build on violation (default: true) -->
-  <CoveragePolicyFailOnViolation>true</CoveragePolicyFailOnViolation>
+  <CoverBouncerFailOnViolation>true</CoverBouncerFailOnViolation>
   
   <!-- Verbosity: quiet, normal, detailed -->
-  <CoveragePolicyVerbosity>normal</CoveragePolicyVerbosity>
+  <CoverBouncerVerbosity>normal</CoverBouncerVerbosity>
 </PropertyGroup>
 ```
 
@@ -363,7 +363,7 @@ jobs:
       
       - name: Run tests with coverage
         run: dotnet test
-        # CoveragePolicy.MSBuild auto-enforces policy
+        # CoverBouncer.MSBuild auto-enforces policy
       
       # Alternatively, explicit verification:
       # - name: Verify coverage policy
@@ -418,18 +418,18 @@ test:
 
 ### Target Flow
 ```xml
-<Target Name="RunCoveragePolicy"
+<Target Name="RunCoverBouncer"
         AfterTargets="VSTest"
-        Condition="'$(EnableCoveragePolicy)' == 'true'">
+        Condition="'$(EnableCoverBouncer)' == 'true'">
   
   <PropertyGroup>
-    <CoveragePolicyConfig Condition="'$(CoveragePolicyConfigFile)' == ''">
+    <CoverBouncerConfig Condition="'$(CoverBouncerConfigFile)' == ''">
       $(SolutionDir)coverage-policy.json
-    </CoveragePolicyConfig>
+    </CoverBouncerConfig>
   </PropertyGroup>
   
   <!-- Execute policy verification -->
-  <Exec Command="dotnet coverbouncer verify --coverage $(CoverletOutput) --config $(CoveragePolicyConfig)"
+  <Exec Command="dotnet coverbouncer verify --coverage $(CoverletOutput) --config $(CoverBouncerConfig)"
         IgnoreExitCode="false"
         WorkingDirectory="$(MSBuildProjectDirectory)" />
 </Target>
@@ -437,13 +437,13 @@ test:
 
 ### Package Structure
 ```
-CoveragePolicy.MSBuild.nupkg
+CoverBouncer.MSBuild.nupkg
 ├── build/
-│   └── CoveragePolicy.MSBuild.targets
+│   └── CoverBouncer.MSBuild.targets
 ├── tools/
 │   └── coverbouncer.exe (or dotnet tool reference)
 └── buildTransitive/
-    └── CoveragePolicy.MSBuild.targets
+    └── CoverBouncer.MSBuild.targets
 ```
 
 ---
@@ -453,17 +453,17 @@ CoveragePolicy.MSBuild.nupkg
 ### Phase 1: Core Foundation (MVP)
 **Goal:** Working end-to-end prototype
 
-- [ ] `CoveragePolicy.Core` library
+- [ ] `CoverBouncer.Core` library
   - [ ] Policy configuration model
   - [ ] Normalized coverage model
   - [ ] Policy engine with violation detection
-- [ ] `CoveragePolicy.Coverlet` adapter
+- [ ] `CoverBouncer.Coverlet` adapter
   - [ ] Parse Coverlet JSON
   - [ ] Convert to normalized model
 - [ ] Tag reader (regex-based)
   - [ ] Parse `// [CoverageProfile("Name")]` comments
   - [ ] Map files to profiles
-- [ ] `CoveragePolicy.CLI` tool
+- [ ] `CoverBouncer.CLI` tool
   - [ ] `init` command
   - [ ] `verify` command
   - [ ] Console output
@@ -479,7 +479,7 @@ CoveragePolicy.MSBuild.nupkg
 ### Phase 2: MSBuild Integration
 **Goal:** Drop-in NuGet package experience
 
-- [ ] `CoveragePolicy.MSBuild` package
+- [ ] `CoverBouncer.MSBuild` package
   - [ ] MSBuild targets file
   - [ ] Auto-run after `dotnet test`
   - [ ] Property-based configuration
@@ -493,7 +493,7 @@ CoveragePolicy.MSBuild.nupkg
   - [ ] Verify build failures
 
 **Success Criteria:**
-- `dotnet add package CoveragePolicy.MSBuild` works
+- `dotnet add package CoverBouncer.MSBuild` works
 - `dotnet test` auto-enforces policy
 - Build fails on violations
 
@@ -532,7 +532,7 @@ CoveragePolicy.MSBuild.nupkg
 - [ ] Roslyn-based tag reader
   - [ ] Proper syntax tree parsing
   - [ ] Better error reporting
-- [ ] `CoveragePolicy.Analyzers`
+- [ ] `CoverBouncer.Analyzers`
   - [ ] IDE warnings for missing tags
   - [ ] Quick fixes
   - [ ] Code snippets

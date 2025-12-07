@@ -17,7 +17,7 @@ Standard coverage tools give you one number: "X% coverage." But not all code is 
 
 ### 1. Install
 ```bash
-dotnet add MyApp.Tests package CoveragePolicy.MSBuild
+dotnet add MyApp.Tests package CoverBouncer.MSBuild
 ```
 
 ### 2. Initialize
@@ -32,7 +32,7 @@ Add to `Directory.Build.props`:
   <CollectCoverage>true</CollectCoverage>
   <CoverletOutput>$(MSBuildProjectDirectory)/TestResults/coverage.json</CoverletOutput>
   <CoverletOutputFormat>json</CoverletOutputFormat>
-  <EnableCoveragePolicy>true</EnableCoveragePolicy>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
 </PropertyGroup>
 ```
 
@@ -70,10 +70,10 @@ Coverage policy automatically enforced! ✅
 
 ## Project Structure
 
-- `CoveragePolicy.Core` - Core coverage policy engine
-- `CoveragePolicy.Coverlet` - Coverlet adapter for coverage data
-- `CoveragePolicy.MSBuild` - MSBuild integration (main user package)
-- `CoveragePolicy.Analyzers` - Roslyn analyzers (coming soon)
+- `CoverBouncer.Core` - Core coverage policy engine
+- `CoverBouncer.Coverlet` - Coverlet adapter for coverage data
+- `CoverBouncer.MSBuild` - MSBuild integration (main user package)
+- `CoverBouncer.Analyzers` - Roslyn analyzers (coming soon)
 
 ## Documentation
 

@@ -15,7 +15,7 @@ This guide will help you set up Cover-Bouncer in your .NET project in just a few
 In your test project, run:
 
 ```bash
-dotnet add package CoveragePolicy.MSBuild
+dotnet add package CoverBouncer.MSBuild
 ```
 
 This is the only package you need! It includes everything required for coverage policy enforcement.
@@ -66,7 +66,7 @@ Add the following to your test project's `.csproj` file or create a `Directory.B
   <CollectCoverage>true</CollectCoverage>
   <CoverletOutput>$(MSBuildProjectDirectory)/TestResults/coverage.json</CoverletOutput>
   <CoverletOutputFormat>json</CoverletOutputFormat>
-  <EnableCoveragePolicy>true</EnableCoveragePolicy>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
 </PropertyGroup>
 ```
 
@@ -248,7 +248,7 @@ Add to your `.csproj` or user-specific settings:
 
 ```xml
 <PropertyGroup>
-  <EnableCoveragePolicy Condition="'$(CI)' != 'true'">false</EnableCoveragePolicy>
+  <EnableCoverBouncer Condition="'$(CI)' != 'true'">false</EnableCoverBouncer>
 </PropertyGroup>
 ```
 

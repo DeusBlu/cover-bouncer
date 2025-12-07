@@ -5,19 +5,19 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.Core", "src\CoveragePolicy.Core\CoveragePolicy.Core.csproj", "{84B0E949-14E8-4658-887B-8E5C3DEB448A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.Core", "src\CoverBouncer.Core\CoverBouncer.Core.csproj", "{84B0E949-14E8-4658-887B-8E5C3DEB448A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.Coverlet", "src\CoveragePolicy.Coverlet\CoveragePolicy.Coverlet.csproj", "{5A89345F-0B77-4F54-A557-4488F7823997}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.Coverlet", "src\CoverBouncer.Coverlet\CoverBouncer.Coverlet.csproj", "{5A89345F-0B77-4F54-A557-4488F7823997}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.CLI", "src\CoveragePolicy.CLI\CoveragePolicy.CLI.csproj", "{54C7E2CD-5E39-4AEA-926E-3066BA3D0D82}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.CLI", "src\CoverBouncer.CLI\CoverBouncer.CLI.csproj", "{54C7E2CD-5E39-4AEA-926E-3066BA3D0D82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.MSBuild", "src\CoveragePolicy.MSBuild\CoveragePolicy.MSBuild.csproj", "{EBC02AB8-1134-461D-B5A8-C9E493934BB4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.MSBuild", "src\CoverBouncer.MSBuild\CoverBouncer.MSBuild.csproj", "{EBC02AB8-1134-461D-B5A8-C9E493934BB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.Core.Tests", "tests\CoveragePolicy.Core.Tests\CoveragePolicy.Core.Tests.csproj", "{43E69C14-234B-40E2-A45F-AD6C05B8E3E6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.Core.Tests", "tests\CoverBouncer.Core.Tests\CoverBouncer.Core.Tests.csproj", "{43E69C14-234B-40E2-A45F-AD6C05B8E3E6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.Coverlet.Tests", "tests\CoveragePolicy.Coverlet.Tests\CoveragePolicy.Coverlet.Tests.csproj", "{01F938A4-59D4-4DD0-B54C-4E11C4EE00B6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.Coverlet.Tests", "tests\CoverBouncer.Coverlet.Tests\CoverBouncer.Coverlet.Tests.csproj", "{01F938A4-59D4-4DD0-B54C-4E11C4EE00B6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoveragePolicy.Integration.Tests", "tests\CoveragePolicy.Integration.Tests\CoveragePolicy.Integration.Tests.csproj", "{698B2EF7-E8BB-438E-8D76-699EB67BD2B0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoverBouncer.Integration.Tests", "tests\CoverBouncer.Integration.Tests\CoverBouncer.Integration.Tests.csproj", "{698B2EF7-E8BB-438E-8D76-699EB67BD2B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
