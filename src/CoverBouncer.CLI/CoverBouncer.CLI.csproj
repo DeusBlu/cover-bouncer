@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CoverBouncer.Core\CoverBouncer.Core.csproj" />
+    <ProjectReference Include="..\CoverBouncer.Coverlet\CoverBouncer.Coverlet.csproj" />
   </ItemGroup>
 
 </Project>

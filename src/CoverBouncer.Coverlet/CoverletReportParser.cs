@@ -1,4 +1,4 @@
-namespace CoverBouncer.Core.Adapters;
+namespace CoverBouncer.Coverlet;
 
 using System.Text.Json;
 using CoverBouncer.Core.Models;

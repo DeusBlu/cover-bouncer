@@ -1,4 +1,4 @@
-﻿using CoverBouncer.Core.Adapters;
+﻿using CoverBouncer.Coverlet;
 using CoverBouncer.Core.Configuration;
 using CoverBouncer.Core.Engine;
 
