@@ -64,7 +64,7 @@ Coverage policy automatically enforced! ✅
 ## How It Works
 
 1. **Tag files** with coverage profiles using file-level attributes
-2. **Set thresholds** in `coverage-policy.json`
+2. **Set thresholds** in `coverbouncer.json`
 3. **Run tests** - Cover-Bouncer validates coverage automatically
 4. **Build fails** if any file violates its profile's threshold
 

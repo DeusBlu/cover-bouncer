@@ -106,10 +106,10 @@ dotnet add MyApp.Tests package CoverBouncer.MSBuild
 dotnet coverbouncer init
 ```
 
-Generates `coverage-policy.json`:
+Generates `coverbouncer.json`:
 ```json
 {
-  "coverletReportPath": "TestResults/coverage.json",
+  "coverageReportPath": "TestResults/coverage.json",
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
@@ -173,7 +173,7 @@ For explicit control:
   run: dotnet test
 
 - name: Verify coverage policy
-  run: dotnet coverbouncer verify --coverage TestResults/coverage.json --config coverage-policy.json
+  run: dotnet coverbouncer verify --coverage TestResults/coverage.json --config coverbouncer.json
 ```
 
 Mark as required status check for branch protection.
@@ -182,72 +182,70 @@ Mark as required status check for branch protection.
 
 ## Configuration
 
-### Single Configuration File: `coverage-policy.json`
+### Single Configuration File: `coverbouncer.json`
 
-Located at solution or project root. Contains all settings.
+Located at solution or project root. Contains **all** configuration - no sprawl!
 
-#### Full Schema
+#### Philosophy
+- **Piggyback on Coverlet** - We read whatever Coverlet outputs, no need to duplicate coverage settings
+- **Profile tags for exclusions** - Don't want coverage? Tag file with `Dto` profile (0.00 threshold)
+- **One source of truth** - Everything in one simple JSON file
+
+#### Complete Schema
 ```json
 {
-  "$schema": "https://coverbouncer.dev/schema/v1/config.json",
-  "coverletReportPath": "TestResults/coverage.json",
-  "sourceRoot": "src/",
+  "coverageReportPath": "TestResults/coverage.json",
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
       "minLine": 0.70,
-      "minBranch": 0.60,
-      "minMethod": 0.70
+      "minBranch": 0.60
     },
     "BusinessLogic": {
       "minLine": 0.90,
-      "minBranch": 0.80,
-      "minMethod": 0.85
+      "minBranch": 0.80
     },
     "Critical": {
       "minLine": 1.00,
-      "minBranch": 1.00,
-      "minMethod": 1.00
+      "minBranch": 1.00
     },
     "Dto": {
       "minLine": 0.00,
-      "minBranch": 0.00,
-      "minMethod": 0.00
-    },
-    "Integration": {
-      "minLine": 0.60,
-      "minBranch": 0.50,
-      "minMethod": 0.60
+      "minBranch": 0.00
     }
-  },
-  "excludePatterns": [
-    "**/obj/**",
-    "**/bin/**",
-    "**/*.Designer.cs",
-    "**/Migrations/**"
-  ],
-  "failOnViolation": true,
-  "reportFormat": "console"
+  }
 }
 ```
 
+#### Property Reference
+
+**`coverageReportPath`** (string, optional)
+- Path to Coverlet JSON coverage report
+- Default: `"TestResults/coverage.json"`
+- Only needed for non-standard Coverlet setups
+
+**`defaultProfile`** (string, required)
+- Profile applied to files without explicit tags
+- Must match a key in `profiles`
+
+**`profiles`** (object, required)
+- Dictionary of profile name → thresholds
+- Each profile can have:
+  - `minLine` (decimal 0.0-1.0) - Minimum line coverage
+  - `minBranch` (decimal 0.0-1.0) - Minimum branch coverage
+  - `minMethod` (decimal 0.0-1.0) - Minimum method coverage (optional)
+
 ### MSBuild Properties
 
-Users can override via MSBuild properties:
+Minimal MSBuild configuration - most users won't need these:
 
 ```xml
 <PropertyGroup>
-  <!-- Enable/disable policy enforcement -->
+  <!-- Enable/disable policy enforcement (default: true when package installed) -->
   <EnableCoverBouncer>true</EnableCoverBouncer>
   
-  <!-- Path to config file -->
-  <CoverBouncerConfigFile>$(SolutionDir)coverage-policy.json</CoverBouncerConfigFile>
-  
-  <!-- Fail build on violation (default: true) -->
-  <CoverBouncerFailOnViolation>true</CoverBouncerFailOnViolation>
-  
-  <!-- Verbosity: quiet, normal, detailed -->
-  <CoverBouncerVerbosity>normal</CoverBouncerVerbosity>
+  <!-- Path to config file (default: coverbouncer.json at solution root) -->
+  <CoverBouncerConfigFile>$(SolutionDir)coverbouncer.json</CoverBouncerConfigFile>
 </PropertyGroup>
 ```
 
@@ -256,10 +254,10 @@ Users can override via MSBuild properties:
 ## CLI Commands
 
 ### `dotnet coverbouncer init`
-Generates default `coverage-policy.json` in current directory.
+Generates default `coverbouncer.json` in current directory.
 
 **Options:**
-- `--output <path>` - Output path (default: `./coverage-policy.json`)
+- `--output <path>` - Output path (default: `./coverbouncer.json`)
 - `--template <name>` - Template: `basic`, `strict`, `relaxed` (default: `basic`)
 
 **Example:**
@@ -274,7 +272,7 @@ Validates coverage against policy. Exits with non-zero code on violation.
 
 **Options:**
 - `--coverage <path>` - Path to Coverlet JSON (default: `TestResults/coverage.json`)
-- `--config <path>` - Path to policy config (default: `coverage-policy.json`)
+- `--config <path>` - Path to policy config (default: `coverbouncer.json`)
 - `--fail-on-violation` - Exit non-zero on violation (default: true)
 - `--output <format>` - Output format: `console`, `json`, `markdown` (default: `console`)
 
@@ -282,7 +280,7 @@ Validates coverage against policy. Exits with non-zero code on violation.
 ```bash
 dotnet coverbouncer verify \
   --coverage TestResults/coverage.json \
-  --config coverage-policy.json \
+  --config coverbouncer.json \
   --output json
 ```
 
@@ -424,7 +422,7 @@ test:
   
   <PropertyGroup>
     <CoverBouncerConfig Condition="'$(CoverBouncerConfigFile)' == ''">
-      $(SolutionDir)coverage-policy.json
+      $(SolutionDir)coverbouncer.json
     </CoverBouncerConfig>
   </PropertyGroup>
   

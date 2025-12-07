@@ -28,11 +28,11 @@ Generate a default configuration file:
 dotnet coverbouncer init
 ```
 
-This creates `coverage-policy.json` in your solution root with sensible defaults:
+This creates `coverbouncer.json` in your solution root with sensible defaults:
 
 ```json
 {
-  "coverletReportPath": "TestResults/coverage.json",
+  "coverageReportPath": "TestResults/coverage.json",
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
@@ -54,6 +54,8 @@ This creates `coverage-policy.json` in your solution root with sensible defaults
   }
 }
 ```
+
+**That's all the configuration you need!** No sprawl, no complexity.
 
 You can customize these thresholds based on your team's standards.
 
@@ -287,7 +289,7 @@ Files without tags use the `defaultProfile`. This is normal! Only tag files that
 ### "Build passes locally but fails in CI"
 
 Check that:
-1. `coverage-policy.json` is committed to source control
+1. `coverbouncer.json` is committed to source control
 2. MSBuild properties are in a committed file (not user-specific `.user` files)
 3. Coverlet is properly configured
 
