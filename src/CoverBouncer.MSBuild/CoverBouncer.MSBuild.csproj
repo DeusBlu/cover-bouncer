@@ -6,4 +6,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoverBouncer.Core\CoverBouncer.Core.csproj" />
+    <ProjectReference Include="..\CoverBouncer.Coverlet\CoverBouncer.Coverlet.csproj" />
+  </ItemGroup>
+
 </Project>

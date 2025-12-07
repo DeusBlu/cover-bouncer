@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <!-- Enable/disable CoverBouncer (default: false, user must opt-in) -->
+    <EnableCoverBouncer Condition="'$(EnableCoverBouncer)' == ''">false</EnableCoverBouncer>
+    
+    <!-- Default coverage report path (Coverlet default location) -->
+    <CoverBouncerCoverageReport Condition="'$(CoverBouncerCoverageReport)' == ''">$(MSBuildProjectDirectory)/TestResults/coverage.json</CoverBouncerCoverageReport>
+    
+    <!-- Default config file name -->
+    <CoverBouncerConfigFile Condition="'$(CoverBouncerConfigFile)' == ''">coverbouncer.json</CoverBouncerConfigFile>
+    
+    <!-- Whether to fail build on violations (default: true) -->
+    <CoverBouncerFailOnViolations Condition="'$(CoverBouncerFailOnViolations)' == ''">true</CoverBouncerFailOnViolations>
+  </PropertyGroup>
+
+  <!-- Load the task assembly -->
+  <UsingTask TaskName="CoverBouncer.MSBuild.VerifyCoverageTask" 
+             AssemblyFile="$(MSBuildThisFileDirectory)../lib/net8.0/CoverBouncer.MSBuild.dll" />
+
+  <!-- Target: Ensure config exists before running tests -->
+  <Target Name="CoverBouncerEnsureConfig" 
+          BeforeTargets="VSTest" 
+          Condition="'$(EnableCoverBouncer)' == 'true'">
+    
+    <Message Importance="normal" 
+             Text="CoverBouncer: Checking for configuration file..." />
+    
+    <Warning Condition="!Exists('$(MSBuildProjectDirectory)/$(CoverBouncerConfigFile)')"
+             Text="CoverBouncer: Configuration file '$(CoverBouncerConfigFile)' not found. Run 'dotnet tool run coverbouncer init' to create one, or coverage verification will be skipped." />
+  </Target>
+
+  <!-- Target: Verify coverage after tests run -->
+  <Target Name="CoverBouncerVerify" 
+          AfterTargets="VSTest" 
+          Condition="'$(EnableCoverBouncer)' == 'true'">
+    
+    <VerifyCoverageTask 
+      CoverageReportPath="$(CoverBouncerCoverageReport)"
+      ConfigPath="$(CoverBouncerConfigFile)"
+      ProjectDirectory="$(MSBuildProjectDirectory)"
+      FailOnViolations="$(CoverBouncerFailOnViolations)" />
+  </Target>
+
+</Project>
