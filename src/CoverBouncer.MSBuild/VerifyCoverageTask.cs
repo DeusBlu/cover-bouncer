@@ -95,14 +95,14 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
                 
                 foreach (var group in byProfile)
                 {
-                    Log.LogError($"  Profile: {group.Key}");
+                    Log.LogError($"CoverBouncer:   Profile: {group.Key}");
                     foreach (var violation in group.OrderBy(v => v.FilePath))
                     {
-                        Log.LogError($"    {violation.FilePath}: Required {violation.RequiredCoverage:P0}, Actual {violation.ActualCoverage:P1}");
+                        Log.LogError($"CoverBouncer:     {violation.FilePath}: Required {violation.RequiredCoverage:P0}, Actual {violation.ActualCoverage:P1}");
                     }
                 }
 
-                Log.LogError($"  Summary: {result.FilesPassed} passed, {result.Violations.Count} failed");
+                Log.LogError($"CoverBouncer:   Summary: {result.FilesPassed} passed, {result.Violations.Count} failed");
 
                 return !FailOnViolations; // Fail build if FailOnViolations is true
             }
@@ -112,7 +112,7 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             Log.LogError($"CoverBouncer: Verification failed: {ex.Message}");
             if (ex.InnerException != null)
             {
-                Log.LogError($"  {ex.InnerException.Message}");
+                Log.LogError($"CoverBouncer:   {ex.InnerException.Message}");
             }
             return false;
         }
