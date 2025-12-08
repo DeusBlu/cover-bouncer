@@ -125,7 +125,7 @@ class Program
             }
 
             // Load configuration
-            var policyConfig = ConfigurationLoader.LoadFromFileOrParent(config);
+            var policyConfig = ConfigurationLoader.LoadSmart(config);
             
             // Parse coverage report
             var parser = new CoverletReportParser();

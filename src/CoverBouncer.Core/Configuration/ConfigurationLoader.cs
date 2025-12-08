@@ -124,4 +124,26 @@ public sealed class ConfigurationLoader
 
         return LoadFromFile(configPath);
     }
+
+    /// <summary>
+    /// Smart loader that handles both file paths and config names.
+    /// If the path exists as a file, loads it directly.
+    /// Otherwise, searches for the config name in current and parent directories.
+    /// </summary>
+    /// <param name="pathOrName">Either a file path or a config file name.</param>
+    /// <returns>Validated policy configuration.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when config file not found.</exception>
+    public static PolicyConfiguration LoadSmart(string pathOrName)
+    {
+        // If it's an existing file path, load it directly
+        if (File.Exists(pathOrName))
+        {
+            return LoadFromFile(pathOrName);
+        }
+
+        // Otherwise, treat it as a config name and search from current directory
+        return LoadFromFileOrParent(
+            startDirectory: Directory.GetCurrentDirectory(),
+            configFileName: pathOrName);
+    }
 }

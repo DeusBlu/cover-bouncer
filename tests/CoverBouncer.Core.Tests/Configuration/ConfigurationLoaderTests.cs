@@ -190,4 +190,101 @@ public class ConfigurationLoaderTests
             Directory.Delete(tempDir, true);
         }
     }
+
+    [Fact]
+    public void LoadSmart_WithExistingFilePath_LoadsDirectly()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var configPath = Path.Combine(tempDir, "myconfig.json");
+            var json = """
+            {
+                "defaultProfile": "Standard",
+                "profiles": {
+                    "Standard": { "minLine": 0.60 }
+                }
+            }
+            """;
+            File.WriteAllText(configPath, json);
+
+            var config = ConfigurationLoader.LoadSmart(configPath);
+
+            Assert.NotNull(config);
+            Assert.Equal("Standard", config.DefaultProfile);
+            Assert.Equal(0.60m, config.Profiles["Standard"].MinLine);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
+    }
+
+    [Fact]
+    public void LoadSmart_WithConfigName_SearchesFromCurrentDirectory()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        var subDir = Path.Combine(tempDir, "sub");
+        Directory.CreateDirectory(subDir);
+        try
+        {
+            // Create config in parent directory
+            var configPath = Path.Combine(tempDir, "coverbouncer.json");
+            var json = """
+            {
+                "defaultProfile": "BusinessLogic",
+                "profiles": {
+                    "BusinessLogic": { "minLine": 0.80 }
+                }
+            }
+            """;
+            File.WriteAllText(configPath, json);
+
+            // Change to subdirectory and search
+            var originalDir = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(subDir);
+            try
+            {
+                var config = ConfigurationLoader.LoadSmart("coverbouncer.json");
+
+                Assert.NotNull(config);
+                Assert.Equal("BusinessLogic", config.DefaultProfile);
+                Assert.Equal(0.80m, config.Profiles["BusinessLogic"].MinLine);
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+            }
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
+    }
+
+    [Fact]
+    public void LoadSmart_WithNonExistentConfigName_ThrowsFileNotFoundException()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var originalDir = Directory.GetCurrentDirectory();
+            Directory.SetCurrentDirectory(tempDir);
+            try
+            {
+                Assert.Throws<FileNotFoundException>(() =>
+                    ConfigurationLoader.LoadSmart("nonexistent.json"));
+            }
+            finally
+            {
+                Directory.SetCurrentDirectory(originalDir);
+            }
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
+    }
 }
