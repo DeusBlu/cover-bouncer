@@ -1,0 +1,12 @@
+{
+  "coverageReportPath": "coverage.json",
+  "defaultProfile": "Standard",
+  "profiles": {
+    "Critical": {
+      "minLine": 1.0
+    },
+    "Standard": {
+      "minLine": 0.6
+    }
+  }
+}

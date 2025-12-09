@@ -5,6 +5,20 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- Dotnet Tool Settings -->
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>coverbouncer</ToolCommandName>
+    <PackageId>CoverBouncer.CLI</PackageId>
+    <Version>1.0.0-preview.1</Version>
+    <Title>CoverBouncer CLI</Title>
+    <Description>Command-line tool for CoverBouncer. Use 'coverbouncer init' to generate configuration files and 'coverbouncer verify' to validate coverage policies.</Description>
+    <PackageTags>coverage;testing;dotnet;csharp;tool;cli</PackageTags>
+    <PackageProjectUrl>https://github.com/DeusBlu/cover-bouncer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Initial preview release of CoverBouncer CLI tool.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

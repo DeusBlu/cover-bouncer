@@ -4,15 +4,54 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    
+    <!-- NuGet Package Settings -->
+    <PackageId>CoverBouncer.MSBuild</PackageId>
+    <Version>1.0.0-preview.1</Version>
+    <Title>CoverBouncer - Profile-Based Coverage Enforcement</Title>
+    <Description>MSBuild integration for CoverBouncer. Automatically enforces profile-based code coverage policies during dotnet test. Tag your files, set thresholds, and let the bouncer keep your coverage standards high.</Description>
+    <PackageTags>coverage;testing;dotnet;csharp;quality;policy;msbuild;coverlet;test-coverage</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/DeusBlu/cover-bouncer</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Initial preview release of CoverBouncer MSBuild integration.</PackageReleaseNotes>
+    
+    <!-- MSBuild Task Package Settings -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeBuildOutput>true</IncludeBuildOutput>
+    <BuildOutputTargetFolder>lib</BuildOutputTargetFolder>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5100</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoverBouncer.Core\CoverBouncer.Core.csproj" />
-    <ProjectReference Include="..\CoverBouncer.Coverlet\CoverBouncer.Coverlet.csproj" />
+    <!-- Bundle Core and Coverlet assemblies into the package -->
+    <ProjectReference Include="..\CoverBouncer.Core\CoverBouncer.Core.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\CoverBouncer.Coverlet\CoverBouncer.Coverlet.csproj" PrivateAssets="all" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include build targets in package -->
+    <None Include="build\CoverBouncer.MSBuild.targets" Pack="true" PackagePath="build" />
+    <None Include="build\CoverBouncer.MSBuild.targets" Pack="true" PackagePath="buildTransitive" />
+    
+    <!-- Include README -->
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <!-- Copy dependencies to output for packaging -->
+  <Target Name="CopyDependenciesToLib" AfterTargets="Build">
+    <ItemGroup>
+      <LibFiles Include="$(OutputPath)CoverBouncer.Core.dll" />
+      <LibFiles Include="$(OutputPath)CoverBouncer.Coverlet.dll" />
+    </ItemGroup>
+  </Target>
 
 </Project>

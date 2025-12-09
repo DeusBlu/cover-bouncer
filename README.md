@@ -75,12 +75,89 @@ Coverage policy automatically enforced! ✅
 - `CoverBouncer.MSBuild` - MSBuild integration (main user package)
 - `CoverBouncer.Analyzers` - Roslyn analyzers (coming soon)
 
+## Example Configuration
+
+```json
+{
+  "defaultProfile": "Standard",
+  "profiles": {
+    "Critical": {
+      "lineCoverageThreshold": 90.0,
+      "description": "Business-critical code (payment, security, etc.)"
+    },
+    "Standard": {
+      "lineCoverageThreshold": 60.0,
+      "description": "Regular application code"
+    },
+    "Integration": {
+      "lineCoverageThreshold": 40.0,
+      "description": "External service adapters"
+    },
+    "Dto": {
+      "lineCoverageThreshold": 0.0,
+      "description": "Data transfer objects"
+    }
+  }
+}
+```
+
+## Installation & Usage
+
+### MSBuild Task (Recommended)
+Automatically validates coverage after `dotnet test`:
+
+```bash
+dotnet add package CoverBouncer.MSBuild
+```
+
+Add to your test project's `.csproj`:
+```xml
+<PropertyGroup>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
+</PropertyGroup>
+```
+
+### CLI Tool
+For manual validation or CI/CD scripts:
+
+```bash
+dotnet tool install -g CoverBouncer.CLI
+coverbouncer validate --config coverbouncer.json --report coverage.json
+```
+
+## Validation Tests
+
+This project includes comprehensive validation tests:
+- ✅ All files pass thresholds
+- ✅ Mixed pass/fail scenarios
+- ✅ Critical violations
+- ✅ Untagged file handling
+- ✅ Multiple profile scenarios
+- ✅ Edge cases (exact thresholds, zero coverage)
+- ✅ Real-world project simulation
+
+Run validation tests: `dotnet test tests/CoverBouncer.ValidationTests`
+
+## Building from Source
+
+```bash
+# Build all projects
+./build.sh build
+
+# Run all tests
+./build.sh test
+
+# Create NuGet packages
+./build.sh pack
+
+# Install CLI tool locally
+./build.sh install-cli
+```
+
 ## Documentation
 
 - [Getting Started Guide](./docs/getting-started.md)
 - [Configuration Reference](./docs/configuration.md)
-- [CI/CD Integration](./docs/ci-cd-integration.md)
-- [Profile Tagging Guide](./docs/profile-tagging.md)
 
 ## Contributing
 
