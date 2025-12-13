@@ -42,16 +42,12 @@
     <None Include="build\CoverBouncer.MSBuild.targets" Pack="true" PackagePath="build" />
     <None Include="build\CoverBouncer.MSBuild.targets" Pack="true" PackagePath="buildTransitive" />
     
+    <!-- Include dependencies in lib folder alongside main DLL -->
+    <None Include="$(OutputPath)CoverBouncer.Core.dll" Pack="true" PackagePath="lib\$(TargetFramework)" Condition="Exists('$(OutputPath)CoverBouncer.Core.dll')" />
+    <None Include="$(OutputPath)CoverBouncer.Coverlet.dll" Pack="true" PackagePath="lib\$(TargetFramework)" Condition="Exists('$(OutputPath)CoverBouncer.Coverlet.dll')" />
+    
     <!-- Include README -->
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
-  <!-- Copy dependencies to output for packaging -->
-  <Target Name="CopyDependenciesToLib" AfterTargets="Build">
-    <ItemGroup>
-      <LibFiles Include="$(OutputPath)CoverBouncer.Core.dll" />
-      <LibFiles Include="$(OutputPath)CoverBouncer.Coverlet.dll" />
-    </ItemGroup>
-  </Target>
 
 </Project>

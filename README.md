@@ -17,7 +17,11 @@ Standard coverage tools give you one number: "X% coverage." But not all code is 
 
 ### 1. Install
 ```bash
+# Install CoverBouncer
 dotnet add MyApp.Tests package CoverBouncer.MSBuild
+
+# Install Coverlet for coverage collection
+dotnet add MyApp.Tests package coverlet.msbuild
 ```
 
 ### 2. Initialize
@@ -122,7 +126,7 @@ For manual validation or CI/CD scripts:
 
 ```bash
 dotnet tool install -g CoverBouncer.CLI
-coverbouncer validate --config coverbouncer.json --report coverage.json
+coverbouncer verify --coverage coverage.json --config coverbouncer.json
 ```
 
 ## Validation Tests
