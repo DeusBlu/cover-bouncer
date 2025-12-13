@@ -154,3 +154,5 @@ yarn-error.log*
 
 # Mac
 .DS_Store
+nuget-config.bat
+nuget-config.sh
