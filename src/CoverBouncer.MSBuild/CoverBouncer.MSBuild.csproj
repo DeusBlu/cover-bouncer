@@ -7,7 +7,7 @@
     
     <!-- NuGet Package Settings -->
     <PackageId>CoverBouncer.MSBuild</PackageId>
-    <Version>1.0.0-preview.1</Version>
+    <Version>1.0.0-preview.2</Version>
     <Title>CoverBouncer - Profile-Based Coverage Enforcement</Title>
     <Description>MSBuild integration for CoverBouncer. Automatically enforces profile-based code coverage policies during dotnet test. Tag your files, set thresholds, and let the bouncer keep your coverage standards high.</Description>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy;msbuild;coverlet;test-coverage</PackageTags>
@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Initial preview release of CoverBouncer MSBuild integration.</PackageReleaseNotes>
+    <PackageReleaseNotes>Automatic Coverlet exclusions and enhanced init command with test framework exclusions.</PackageReleaseNotes>
     
     <!-- MSBuild Task Package Settings -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0-preview.2] - 2024-12-13
+
 ### Added
 - **Automatic Coverlet Exclusions**
   - CoverBouncer assemblies are now automatically excluded from Coverlet instrumentation via `buildTransitive` targets
@@ -129,4 +131,5 @@ See [ROADMAP.md](ROADMAP.md) for planned features including:
 
 ---
 
+[1.0.0-preview.2]: https://github.com/DeusBlu/cover-bouncer/releases/tag/v1.0.0-preview.2
 [1.0.0-preview.1]: https://github.com/DeusBlu/cover-bouncer/releases/tag/v1.0.0-preview.1
