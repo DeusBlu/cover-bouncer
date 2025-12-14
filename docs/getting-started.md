@@ -293,6 +293,81 @@ Check that:
 2. MSBuild properties are in a committed file (not user-specific `.user` files)
 3. Coverlet is properly configured
 
+### Coverlet Warnings about CoverBouncer Assemblies
+
+**This is fixed automatically!** CoverBouncer v1.0.0-preview.1 and later automatically exclude CoverBouncer assemblies from Coverlet instrumentation.
+
+If you're seeing warnings like:
+```
+Instrumentation of assembly 'CoverBouncer.Core' failed
+Unable to find module or source files
+```
+
+**Solution:** Update to the latest version of CoverBouncer.MSBuild. The exclusions are applied automatically via `buildTransitive` targets.
+
+**Manual workaround** (if needed):
+```xml
+<PropertyGroup>
+  <Exclude>$(Exclude);[CoverBouncer.*]*</Exclude>
+</PropertyGroup>
+```
+
+## Coverlet Best Practices
+
+### Automatic Test Framework Exclusions
+
+When you run `dotnet coverbouncer init`, you'll be prompted to exclude common test frameworks from coverage. This is **recommended** for:
+
+- **Better performance**: Faster test execution
+- **Cleaner reports**: Focus on your actual code
+- **No warnings**: Eliminates missing symbols warnings
+
+The init command will offer to add:
+```xml
+<PropertyGroup>
+  <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+</PropertyGroup>
+```
+
+### Include Only Production Code
+
+For maximum control, you can explicitly include only your production assemblies:
+
+```xml
+<PropertyGroup>
+  <!-- Only collect coverage on MyApp assemblies -->
+  <Include>[MyApp]*;[MyApp.Core]*;[MyApp.Services]*</Include>
+</PropertyGroup>
+```
+
+This approach:
+- ✅ Ensures test code is never instrumented
+- ✅ Improves performance significantly
+- ✅ Makes coverage reports crystal clear
+
+### Recommended Configuration
+
+For most projects, use this pattern in `Directory.Build.props`:
+
+```xml
+<Project>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <!-- Enable Coverlet -->
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutput>$(MSBuildProjectDirectory)/TestResults/coverage.json</CoverletOutput>
+    <CoverletOutputFormat>json</CoverletOutputFormat>
+    
+    <!-- Enable CoverBouncer -->
+    <EnableCoverBouncer>true</EnableCoverBouncer>
+    
+    <!-- Exclude test frameworks (CoverBouncer assemblies excluded automatically) -->
+    <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+  </PropertyGroup>
+</Project>
+```
+
+**Note:** CoverBouncer automatically adds `[CoverBouncer.*]*` to exclusions, so you don't need to include it manually.
+
 ## Next Steps
 
 - Read the [Configuration Reference](./configuration.md) for all options

@@ -84,16 +84,15 @@ Ensure users can adopt CoverBouncer with minimal friction.
 - Ensure icon/logo if available
 - Check package size and dependencies
 
-#### 2.3 Example Projects
-- Verify examples/SampleProject works end-to-end
-- Add comments explaining configuration
-- Ensure it demonstrates key features
+#### 2.3 Verification
+- Verify cover-bouncer-nuget-verification works end-to-end
+- Ensure it demonstrates key features  
 - Test from user perspective (no prior knowledge)
 
 ### Success Criteria
 - ✅ User can install and configure in <5 minutes
 - ✅ Documentation answers common questions
-- ✅ Example project runs successfully
+- ✅ Verification project runs successfully
 - ✅ Package metadata is professional
 
 ### Time Estimate

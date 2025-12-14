@@ -5,6 +5,31 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Automatic Coverlet Exclusions**
+  - CoverBouncer assemblies are now automatically excluded from Coverlet instrumentation via `buildTransitive` targets
+  - Eliminates "missing symbols" warnings for CoverBouncer NuGet packages
+  - No manual configuration required - works out of the box
+
+- **Enhanced Init Command**
+  - Detects Coverlet usage in project files
+  - Prompts user to add recommended test framework exclusions to Directory.Build.props
+  - Auto-configures exclusions for: xunit, FluentAssertions, Moq, NSubstitute
+  - Creates or updates Directory.Build.props with optimal Coverlet settings
+  - User-friendly prompts with clear explanations
+
+### Changed
+- Updated MSBuild targets to automatically append `[CoverBouncer.*]*` to Coverlet's `<Exclude>` property
+
+### Documentation
+- Added comprehensive "Coverlet Integration" section to README
+- Enhanced getting-started.md with Coverlet best practices
+- Added troubleshooting section for Coverlet-related warnings
+- Documented automatic exclusions and optional test framework exclusions
+- Included recommended Directory.Build.props patterns
+
 ## [1.0.0-preview.1] - 2024-12-13
 
 ### Added

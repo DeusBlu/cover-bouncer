@@ -64,6 +64,55 @@ Coverage policy automatically enforced! ✅
 - 📦 **NuGet Packaged** - Easy to install and distribute
 - 🏷️ **File-Level Tags** - Simple attribute-based profile assignment
 - ⚙️ **Single Config File** - No configuration sprawl
+- 🔧 **Auto-Configuration** - Automatically excludes CoverBouncer from coverage
+
+## Coverlet Integration
+
+CoverBouncer works seamlessly with [Coverlet](https://github.com/coverlet-coverage/coverlet), the popular .NET code coverage library.
+
+### Automatic Exclusions
+
+When you add CoverBouncer.MSBuild as a NuGet package, it **automatically excludes** all CoverBouncer assemblies from Coverlet instrumentation via `buildTransitive` targets. This prevents warnings about missing debug symbols and improves performance.
+
+**What's excluded automatically:**
+- `[CoverBouncer.Core]*`
+- `[CoverBouncer.Coverlet]*`
+- `[CoverBouncer.MSBuild]*`
+
+No manual configuration needed! 🎉
+
+### Optional: Exclude Test Frameworks
+
+During `dotnet coverbouncer init`, you'll be prompted to exclude common test frameworks and mocking libraries for better performance. This is **optional but recommended**:
+
+```xml
+<!-- Directory.Build.props -->
+<PropertyGroup>
+  <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+</PropertyGroup>
+```
+
+### Why Exclude These?
+
+- **Performance**: Faster test runs by skipping unnecessary instrumentation
+- **Noise Reduction**: Focus coverage reports on your actual code
+- **No Warnings**: Prevents "missing symbols" warnings for NuGet packages
+
+### Manual Configuration
+
+If you need more control over Coverlet exclusions:
+
+```xml
+<PropertyGroup>
+  <!-- Include only your production code -->
+  <Include>[MyApp]*</Include>
+  
+  <!-- Or exclude specific assemblies -->
+  <Exclude>$(Exclude);[MyApp.Tests]*;[ThirdParty.*]*</Exclude>
+</PropertyGroup>
+```
+
+See [Coverlet documentation](https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md) for more options.
 
 ## How It Works
 

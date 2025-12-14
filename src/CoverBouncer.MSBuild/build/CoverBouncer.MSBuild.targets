@@ -15,6 +15,13 @@
     <CoverBouncerFailOnViolations Condition="'$(CoverBouncerFailOnViolations)' == ''">true</CoverBouncerFailOnViolations>
   </PropertyGroup>
 
+  <!-- Automatically exclude CoverBouncer assemblies from Coverlet instrumentation -->
+  <!-- This prevents warnings about missing symbols for CoverBouncer NuGet packages -->
+  <PropertyGroup>
+    <ExcludeByAttribute>$(ExcludeByAttribute);Obsolete;GeneratedCodeAttribute;CompilerGeneratedAttribute</ExcludeByAttribute>
+    <Exclude>$(Exclude);[CoverBouncer.*]*</Exclude>
+  </PropertyGroup>
+
   <!-- Load the task assembly -->
   <PropertyGroup>
     <!-- When used as NuGet package, DLL is in lib folder relative to this file -->

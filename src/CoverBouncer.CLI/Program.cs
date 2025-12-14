@@ -86,6 +86,10 @@ class Program
             Console.WriteLine("  • Dto (0% - no requirements)");
             Console.WriteLine();
             Console.WriteLine("Tag files with: [CoverageProfile(\"ProfileName\")]");
+            Console.WriteLine();
+            
+            // Check for Coverlet and offer to configure exclusions
+            OfferCoverletConfiguration();
             
             return 0;
         }
@@ -184,6 +188,134 @@ class Program
                 Console.WriteLine($"   {ex.InnerException.Message}");
             }
             return 1;
+        }
+    }
+    
+    /// <summary>
+    /// Checks for Coverlet usage and offers to configure exclusions
+    /// </summary>
+    static void OfferCoverletConfiguration()
+    {
+        // Check if Coverlet is being used
+        if (!IsCoverletDetected())
+        {
+            return;
+        }
+        
+        Console.WriteLine("ℹ️  Coverlet detected!");
+        Console.WriteLine();
+        Console.WriteLine("💡 Recommendation: Exclude test frameworks from coverage to improve performance");
+        Console.WriteLine("   and reduce noise. CoverBouncer assemblies are already excluded automatically.");
+        Console.WriteLine();
+        Console.WriteLine("Would you like to add recommended exclusions to Directory.Build.props? (Y/n): ");
+        
+        var response = Console.ReadLine()?.Trim().ToLowerInvariant();
+        
+        if (response != "y" && response != "yes" && response != "")
+        {
+            Console.WriteLine("Skipped. You can manually configure exclusions later if needed.");
+            return;
+        }
+        
+        try
+        {
+            AddCoverletExclusions();
+            Console.WriteLine("✅ Added Coverlet exclusions to Directory.Build.props");
+            Console.WriteLine();
+            Console.WriteLine("Excluded assemblies:");
+            Console.WriteLine("  • [xunit.*]* (xUnit test framework)");
+            Console.WriteLine("  • [FluentAssertions]*");
+            Console.WriteLine("  • [Moq]*");
+            Console.WriteLine("  • [NSubstitute]*");
+            Console.WriteLine();
+            Console.WriteLine("Note: CoverBouncer automatically excludes [CoverBouncer.*]* via MSBuild targets.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"⚠️  Could not update Directory.Build.props: {ex.Message}");
+            Console.WriteLine("   You can manually add exclusions if needed.");
+        }
+    }
+    
+    /// <summary>
+    /// Detects if Coverlet is being used in the current project
+    /// </summary>
+    static bool IsCoverletDetected()
+    {
+        // Look for .csproj files in current directory
+        var csprojFiles = Directory.GetFiles(".", "*.csproj", SearchOption.AllDirectories);
+        
+        foreach (var csprojFile in csprojFiles)
+        {
+            try
+            {
+                var content = File.ReadAllText(csprojFile);
+                
+                // Check for Coverlet package references or CollectCoverage property
+                if (content.Contains("coverlet.msbuild", StringComparison.OrdinalIgnoreCase) ||
+                    content.Contains("coverlet.collector", StringComparison.OrdinalIgnoreCase) ||
+                    content.Contains("<CollectCoverage>true</CollectCoverage>", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+                // Ignore file read errors
+            }
+        }
+        
+        return false;
+    }
+    
+    /// <summary>
+    /// Adds recommended Coverlet exclusions to Directory.Build.props
+    /// </summary>
+    static void AddCoverletExclusions()
+    {
+        const string directoryBuildPropsPath = "Directory.Build.props";
+        
+        // Create Directory.Build.props if it doesn't exist
+        if (!File.Exists(directoryBuildPropsPath))
+        {
+            var newContent = @"<Project>
+  <PropertyGroup>
+    <!-- Coverlet exclusions: Exclude test frameworks and mocking libraries from coverage -->
+    <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+  </PropertyGroup>
+</Project>";
+            File.WriteAllText(directoryBuildPropsPath, newContent);
+            return;
+        }
+        
+        // Update existing file
+        var content = File.ReadAllText(directoryBuildPropsPath);
+        
+        // Check if exclusions already exist
+        if (content.Contains("[xunit.*]*", StringComparison.OrdinalIgnoreCase) ||
+            content.Contains("<Exclude>", StringComparison.OrdinalIgnoreCase))
+        {
+            Console.WriteLine("ℹ️  Exclusions already configured in Directory.Build.props");
+            return;
+        }
+        
+        // Add exclusions
+        var exclusionsBlock = @"
+  <PropertyGroup>
+    <!-- Coverlet exclusions: Exclude test frameworks and mocking libraries from coverage -->
+    <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+  </PropertyGroup>";
+        
+        // Insert before closing </Project> tag
+        if (content.Contains("</Project>", StringComparison.OrdinalIgnoreCase))
+        {
+            var lastIndex = content.LastIndexOf("</Project>", StringComparison.OrdinalIgnoreCase);
+            content = content.Insert(lastIndex, exclusionsBlock + "\n");
+            File.WriteAllText(directoryBuildPropsPath, content);
+        }
+        else
+        {
+            throw new InvalidOperationException("Invalid Directory.Build.props format");
         }
     }
 }
