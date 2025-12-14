@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Automated File Tagging** 🏷️
+  - Interactive tagging mode: `dotnet coverbouncer tag --interactive`
+    - Prompts for file pattern
+    - Preview matching files
+    - Select profile from list
+    - Confirm before applying
+  - Auto-suggest mode: `dotnet coverbouncer tag --auto-suggest`
+    - Automatically suggests profiles based on file naming patterns
+    - Smart detection: Controllers→Integration, Services→BusinessLogic, etc.
+    - Shows grouped suggestions for review
+  - Batch tagging modes:
+    - Pattern-based: `--pattern "**/*Service.cs" --profile BusinessLogic`
+    - Directory-based: `--path "./Security" --profile Critical`
+    - File list: `--files services.txt --profile Standard`
+  - Safety features:
+    - `--dry-run` to preview changes without modifying files
+    - `--backup` to create backup files before tagging
+    - Validation against profiles in coverbouncer.json
+    - Skip files already tagged with same profile
+
+- **New Core Components**
+  - `FileTagWriter` class for writing profile tags to source files
+  - `FileTaggingService` class for batch operations and pattern matching
+  - Support for glob patterns via Microsoft.Extensions.FileSystemGlobbing
+
+- **Comprehensive Test Coverage**
+  - Added 50 new tests for file tagging features (71 tests total, all passing)
+  - `FileTagWriterTests` - 20 tests for tag writing, removal, and edge cases
+  - `FileTaggingServiceTests` - 30 tests for batch operations, pattern matching, and suggestions
+  - Full coverage of positive paths, negative paths, and edge cases
+  - Ensures file safety with backup, dry-run, and error handling tests
+  - See TEST-COVERAGE-SUMMARY.md for details
+
+### Changed
+- **Documentation Overhaul - "Profiles Are Customizable!"**
+  - README now prominently states profiles are completely customizable
+  - Added examples of custom profile names (MustHaveTests, LegacyCode, WillFixLater, etc.)
+  - Emphasizes starting with achievable goals based on current coverage
+  - Removed intimidating tone suggesting 80-100% is mandatory
+  - Added realistic examples: "30% now? Start with 35%"
+  - Focus on improvement, not perfection
+  
+- **Enhanced Documentation**
+  - Updated getting-started.md with profile customization section
+  - Added comprehensive tagging workflows (manual + automated)
+  - Created new docs/tagging-guide.md with:
+    - All tagging modes explained with examples
+    - Best practices and troubleshooting
+    - Use cases: new project, legacy project, gradual migration
+    - Git workflow integration
+  - Updated CLI help to include tag command options
+
+### Dependencies
+- Added Microsoft.Extensions.FileSystemGlobbing 8.0.0 to CoverBouncer.Core
+
 ## [1.0.0-preview.2] - 2024-12-13
 
 ### Added

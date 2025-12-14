@@ -13,6 +13,40 @@ Standard coverage tools give you one number: "X% coverage." But not all code is 
 
 **Cover-Bouncer lets you enforce different coverage requirements for different parts of your codebase.**
 
+## 🎨 Profiles Are Completely Customizable!
+
+**You are NOT limited to any specific profile names or percentages:**
+
+❌ **Common Misconception:**
+   "I must use 'Critical' (90%), 'Standard' (80%), etc."
+
+✅ **Reality:**
+   "I can use ANY names with ANY thresholds!"
+
+### Examples of Valid Profiles:
+
+```json
+{
+  "profiles": {
+    "MustHaveTests": { "minLine": 0.45 },      // Start achievable!
+    "NiceToHave": { "minLine": 0.25 },
+    "SecurityStuff": { "minLine": 0.75 },      // Your own names!
+    "LegacyCode": { "minLine": 0.10 },         // Be honest about reality
+    "WillFixLater": { "minLine": 0.0 }
+  }
+}
+```
+
+### Start Where YOU Are:
+
+- Have 30% coverage now? **Start with 35% threshold**
+- Have 60% coverage? **Maybe aim for 65-70%**
+- Have 5% coverage? **Start at 10% and celebrate progress!**
+
+**The goal is IMPROVEMENT, not perfection!** 📈
+
+The built-in templates (Basic, Strict, Relaxed) are just **suggestions** to get you started. Feel free to customize them to match your team's current reality and goals.
+
 ## Quick Start
 
 ### 1. Install
@@ -41,6 +75,11 @@ Add to `Directory.Build.props`:
 ```
 
 ### 4. Tag Your Files
+
+You can tag files manually or use the CLI tagging features:
+
+#### Manual Tagging
+Add a comment with the profile attribute:
 ```csharp
 // [CoverageProfile("Critical")]
 namespace MyApp.PaymentProcessing
@@ -48,6 +87,40 @@ namespace MyApp.PaymentProcessing
     public class PaymentService { }
 }
 ```
+
+#### Automated Tagging
+
+**Interactive Mode** (Recommended for beginners):
+```bash
+dotnet coverbouncer tag --interactive
+```
+
+**Batch Mode** - Tag by pattern:
+```bash
+# Tag all service files with "Standard" profile
+dotnet coverbouncer tag --pattern "**/*Service.cs" --profile Standard
+
+# Tag entire folder with "Critical" profile
+dotnet coverbouncer tag --path "./Security" --profile Critical
+
+# Tag files from a list
+dotnet coverbouncer tag --files services.txt --profile Standard
+```
+
+**Smart Detection** - Auto-suggest profiles:
+```bash
+# Automatically suggest profiles based on file patterns
+dotnet coverbouncer tag --auto-suggest
+
+# Preview changes without modifying files
+dotnet coverbouncer tag --pattern "**/*.cs" --profile Standard --dry-run
+```
+
+The CLI automatically detects patterns like:
+- `*Controller.cs` → Integration
+- `*Service.cs` → BusinessLogic
+- `Security/*` → Critical
+- `Models/*` → Dto
 
 ### 5. Run Tests
 ```bash
@@ -59,12 +132,14 @@ Coverage policy automatically enforced! ✅
 ## Features
 
 - 🎯 **Profile-Based Coverage** - Different thresholds for different code types
+- 🤖 **Smart Tagging** - Interactive, batch, and auto-suggest modes for tagging files
 - 🔌 **Drop-In Integration** - Works with your existing `dotnet test` workflow
 - 🚫 **CI/CD Ready** - Blocks merges when coverage drops below thresholds
 - 📦 **NuGet Packaged** - Easy to install and distribute
 - 🏷️ **File-Level Tags** - Simple attribute-based profile assignment
 - ⚙️ **Single Config File** - No configuration sprawl
 - 🔧 **Auto-Configuration** - Automatically excludes CoverBouncer from coverage
+- 🎨 **Fully Customizable** - Use any profile names and thresholds you want
 
 ## Coverlet Integration
 
@@ -209,8 +284,10 @@ Run validation tests: `dotnet test tests/CoverBouncer.ValidationTests`
 
 ## Documentation
 
-- [Getting Started Guide](./docs/getting-started.md)
-- [Configuration Reference](./docs/configuration.md)
+- [Getting Started Guide](./docs/getting-started.md) - Complete setup walkthrough
+- [File Tagging Guide](./docs/tagging-guide.md) - Learn all the ways to tag files (manual & automated)
+- [Configuration Reference](./docs/configuration.md) - Detailed configuration options
+- [Coverlet Integration](./docs/coverlet-integration.md) - Best practices for Coverlet setup
 
 ## Contributing
 

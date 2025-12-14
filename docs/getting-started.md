@@ -57,6 +57,43 @@ This creates `coverbouncer.json` in your solution root with sensible defaults:
 
 **That's all the configuration you need!** No sprawl, no complexity.
 
+## 🎨 Important: Profiles Are YOUR Choice!
+
+**You are NOT limited to these profile names or percentages!** The templates above are just suggestions.
+
+### Customize to Match Your Reality
+
+Feel free to change profile names and thresholds to match your team's current state:
+
+```json
+{
+  "defaultProfile": "WorkInProgress",
+  "profiles": {
+    "MustHaveTests": { "minLine": 0.45 },      // Start where you are!
+    "TryingHarder": { "minLine": 0.30 },
+    "SecurityStuff": { "minLine": 0.75 },      // Your own names!
+    "LegacyCode": { "minLine": 0.10 },         // Be honest
+    "NewCode": { "minLine": 0.80 },            // Higher bar for new work
+    "EventuallyTest": { "minLine": 0.0 }
+  }
+}
+```
+
+### Start Where YOU Are:
+
+- **Have 30% coverage now?** Start with 35% threshold
+- **Have 60% coverage?** Maybe aim for 65-70%
+- **Have 5% coverage?** Start at 10% and celebrate progress!
+- **Inherited legacy code?** Create a "Legacy" profile with realistic goals
+
+**The goal is IMPROVEMENT, not perfection!** 📈
+
+Use profiles to:
+- Set achievable goals that match your current coverage
+- Gradually increase thresholds over time
+- Treat new code differently than legacy code
+- Reflect your team's priorities (security, business logic, etc.)
+
 You can customize these thresholds based on your team's standards.
 
 ### Step 3: Enable Coverage Collection
@@ -79,6 +116,10 @@ dotnet add package coverlet.msbuild
 ```
 
 ### Step 4: Tag Your Source Files
+
+You can tag files manually or use the automated CLI tools.
+
+#### Option A: Manual Tagging
 
 Add profile tags to your source files using comments at the top:
 
@@ -120,6 +161,66 @@ namespace MyApp.Services
 ```
 
 Files without tags will use the `defaultProfile` (Standard).
+
+#### Option B: Automated Tagging with CLI
+
+For bulk tagging, use the CLI tool. This is **much faster** for large projects!
+
+**1. Interactive Mode** (Recommended for beginners):
+```bash
+dotnet coverbouncer tag --interactive
+
+# Prompts you to:
+# 1. Enter file pattern (e.g., **/*Service.cs)
+# 2. Choose profile from list
+# 3. Preview matching files
+# 4. Confirm changes
+```
+
+**2. Auto-Suggest Mode** (Smart pattern detection):
+```bash
+dotnet coverbouncer tag --auto-suggest
+
+# Automatically suggests profiles based on:
+# - *Controller.cs → Integration
+# - *Service.cs → BusinessLogic
+# - Security/* → Critical
+# - Models/* → Dto
+# Then asks for confirmation
+```
+
+**3. Batch Mode** (For scripts and automation):
+```bash
+# Tag all service files
+dotnet coverbouncer tag --pattern "**/*Service.cs" --profile BusinessLogic
+
+# Tag entire directory
+dotnet coverbouncer tag --path "./Security" --profile Critical
+
+# Tag from file list
+dotnet coverbouncer tag --files services.txt --profile Standard
+
+# Preview without changing files
+dotnet coverbouncer tag --pattern "**/*.cs" --profile Standard --dry-run
+
+# Create backups before tagging
+dotnet coverbouncer tag --pattern "**/*Service.cs" --profile Standard --backup
+```
+
+**4. Example Workflow:**
+```bash
+# Start with auto-suggest to tag most files
+dotnet coverbouncer tag --auto-suggest
+
+# Then manually adjust specific critical areas
+dotnet coverbouncer tag --path "./Security" --profile Critical
+
+# Preview what would change
+dotnet coverbouncer tag --pattern "**/*Controller.cs" --profile Integration --dry-run
+
+# Apply it
+dotnet coverbouncer tag --pattern "**/*Controller.cs" --profile Integration
+```
 
 ### Step 5: Run Your Tests
 

@@ -1,6 +1,7 @@
 ﻿using CoverBouncer.Coverlet;
 using CoverBouncer.Core.Configuration;
 using CoverBouncer.Core.Engine;
+using CoverBouncer.Core.Models;
 
 namespace CoverBouncer.CLI;
 
@@ -20,6 +21,7 @@ class Program
         {
             "init" => HandleInit(args.Skip(1).ToArray()),
             "verify" => HandleVerify(args.Skip(1).ToArray()),
+            "tag" => HandleTag(args.Skip(1).ToArray()),
             "help" or "--help" or "-h" => ShowHelp(),
             _ => ShowHelp()
         };
@@ -36,6 +38,16 @@ class Program
         Console.WriteLine("  verify                    Verify coverage against policy");
         Console.WriteLine("    --coverage, -c <path>   Coverage report path (default: TestResults/coverage.json)");
         Console.WriteLine("    --config, -f <path>     Config file path (default: coverbouncer.json)");
+        Console.WriteLine();
+        Console.WriteLine("  tag                       Tag files with coverage profiles");
+        Console.WriteLine("    --pattern <glob>        Tag files matching glob pattern (e.g., \"**/*Service.cs\")");
+        Console.WriteLine("    --path <dir>            Tag all files in directory");
+        Console.WriteLine("    --files <list>          Tag files listed in text file (one per line)");
+        Console.WriteLine("    --profile <name>        Profile to apply (required)");
+        Console.WriteLine("    --auto-suggest          Suggest profiles based on file patterns");
+        Console.WriteLine("    --interactive           Interactive mode with prompts");
+        Console.WriteLine("    --dry-run               Show what would happen without modifying files");
+        Console.WriteLine("    --backup                Create backup files before tagging");
         Console.WriteLine();
         Console.WriteLine("  help                      Show this help");
         return 0;
@@ -189,6 +201,361 @@ class Program
             }
             return 1;
         }
+    }
+    
+    static int HandleTag(string[] args)
+    {
+        try
+        {
+            string? pattern = null;
+            string? path = null;
+            string? filesListPath = null;
+            string? profile = null;
+            bool autoSuggest = false;
+            bool interactive = false;
+            bool dryRun = false;
+            bool backup = false;
+
+            // Parse options
+            for (int i = 0; i < args.Length; i++)
+            {
+                switch (args[i])
+                {
+                    case "--pattern":
+                        if (i + 1 < args.Length) pattern = args[++i];
+                        break;
+                    case "--path":
+                        if (i + 1 < args.Length) path = args[++i];
+                        break;
+                    case "--files":
+                        if (i + 1 < args.Length) filesListPath = args[++i];
+                        break;
+                    case "--profile":
+                        if (i + 1 < args.Length) profile = args[++i];
+                        break;
+                    case "--auto-suggest":
+                        autoSuggest = true;
+                        break;
+                    case "--interactive":
+                        interactive = true;
+                        break;
+                    case "--dry-run":
+                        dryRun = true;
+                        break;
+                    case "--backup":
+                        backup = true;
+                        break;
+                }
+            }
+
+            var taggingService = new FileTaggingService();
+            var baseDirectory = Directory.GetCurrentDirectory();
+
+            // Interactive mode
+            if (interactive)
+            {
+                return HandleInteractiveTagging(taggingService, baseDirectory);
+            }
+
+            // Auto-suggest mode
+            if (autoSuggest)
+            {
+                return HandleAutoSuggest(taggingService, baseDirectory, dryRun, backup);
+            }
+
+            // Validate that profile is specified for non-interactive modes
+            if (string.IsNullOrEmpty(profile))
+            {
+                Console.WriteLine("❌ --profile is required (or use --interactive or --auto-suggest)");
+                return 1;
+            }
+
+            // Load configuration to validate profile exists
+            var config = TryLoadConfiguration();
+            if (config != null && !config.Profiles.ContainsKey(profile))
+            {
+                Console.WriteLine($"⚠️  Warning: Profile '{profile}' not found in coverbouncer.json");
+                Console.WriteLine("   Available profiles: " + string.Join(", ", config.Profiles.Keys));
+                Console.WriteLine();
+            }
+
+            FileTaggingService.TaggingResult result;
+
+            // Execute tagging based on mode
+            if (!string.IsNullOrEmpty(pattern))
+            {
+                Console.WriteLine($"🏷️  Tagging files matching pattern: {pattern}");
+                Console.WriteLine($"   Profile: {profile}");
+                if (dryRun) Console.WriteLine("   [DRY RUN - No files will be modified]");
+                Console.WriteLine();
+
+                result = taggingService.TagByPattern(baseDirectory, pattern, profile, backup, dryRun);
+            }
+            else if (!string.IsNullOrEmpty(path))
+            {
+                Console.WriteLine($"🏷️  Tagging files in directory: {path}");
+                Console.WriteLine($"   Profile: {profile}");
+                if (dryRun) Console.WriteLine("   [DRY RUN - No files will be modified]");
+                Console.WriteLine();
+
+                result = taggingService.TagByDirectory(path, profile, recursive: true, backup, dryRun);
+            }
+            else if (!string.IsNullOrEmpty(filesListPath))
+            {
+                Console.WriteLine($"🏷️  Tagging files from list: {filesListPath}");
+                Console.WriteLine($"   Profile: {profile}");
+                if (dryRun) Console.WriteLine("   [DRY RUN - No files will be modified]");
+                Console.WriteLine();
+
+                var files = FileTaggingService.ReadFileList(filesListPath);
+                result = taggingService.TagFiles(files, profile, backup, dryRun);
+            }
+            else
+            {
+                Console.WriteLine("❌ Please specify --pattern, --path, --files, --interactive, or --auto-suggest");
+                return 1;
+            }
+
+            // Display results
+            DisplayTaggingResults(result, dryRun);
+
+            return result.FilesErrored > 0 ? 1 : 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"❌ Tagging failed: {ex.Message}");
+            return 1;
+        }
+    }
+
+    static int HandleInteractiveTagging(FileTaggingService taggingService, string baseDirectory)
+    {
+        Console.WriteLine("🎨 Interactive Tagging Mode");
+        Console.WriteLine();
+
+        // Step 1: Select pattern
+        Console.WriteLine("Enter file pattern to tag (e.g., **/*Service.cs, ./Security/**/*.cs):");
+        Console.Write("> ");
+        var pattern = Console.ReadLine()?.Trim();
+
+        if (string.IsNullOrEmpty(pattern))
+        {
+            Console.WriteLine("❌ Pattern is required");
+            return 1;
+        }
+
+        // Preview matching files
+        var matcher = new Microsoft.Extensions.FileSystemGlobbing.Matcher();
+        matcher.AddInclude(pattern);
+        var matchResult = matcher.Execute(
+            new Microsoft.Extensions.FileSystemGlobbing.Abstractions.DirectoryInfoWrapper(
+                new DirectoryInfo(baseDirectory)));
+        
+        var matchedFiles = matchResult.Files
+            .Select(f => Path.Combine(baseDirectory, f.Path))
+            .Where(f => f.EndsWith(".cs", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        Console.WriteLine();
+        Console.WriteLine($"Found {matchedFiles.Count} files matching pattern:");
+        foreach (var file in matchedFiles.Take(10))
+        {
+            Console.WriteLine($"  • {Path.GetRelativePath(baseDirectory, file)}");
+        }
+        if (matchedFiles.Count > 10)
+        {
+            Console.WriteLine($"  ... and {matchedFiles.Count - 10} more");
+        }
+        Console.WriteLine();
+
+        // Step 2: Select profile
+        var config = TryLoadConfiguration();
+        var profiles = config?.Profiles.Keys.ToList() ?? new List<string> { "Standard", "Critical", "BusinessLogic", "Dto" };
+
+        Console.WriteLine("Available profiles:");
+        for (int i = 0; i < profiles.Count; i++)
+        {
+            var profileName = profiles[i];
+            var threshold = config?.Profiles.GetValueOrDefault(profileName)?.MinLine;
+            var thresholdStr = threshold.HasValue ? $"({threshold.Value:P0} line coverage)" : "";
+            Console.WriteLine($"  {i + 1}. {profileName} {thresholdStr}");
+        }
+        Console.WriteLine();
+        Console.Write("Select profile (number or name): ");
+        var profileInput = Console.ReadLine()?.Trim();
+
+        string? selectedProfile = null;
+        if (int.TryParse(profileInput, out var profileIndex) && profileIndex > 0 && profileIndex <= profiles.Count)
+        {
+            selectedProfile = profiles[profileIndex - 1];
+        }
+        else if (!string.IsNullOrEmpty(profileInput))
+        {
+            selectedProfile = profileInput;
+        }
+
+        if (string.IsNullOrEmpty(selectedProfile))
+        {
+            Console.WriteLine("❌ Profile is required");
+            return 1;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"Selected profile: {selectedProfile}");
+        Console.WriteLine();
+
+        // Step 3: Confirm
+        Console.Write("Apply changes? (Y/n): ");
+        var confirm = Console.ReadLine()?.Trim().ToLowerInvariant();
+
+        if (confirm == "n" || confirm == "no")
+        {
+            Console.WriteLine("Cancelled.");
+            return 0;
+        }
+
+        // Execute tagging
+        var result = taggingService.TagFiles(matchedFiles, selectedProfile, createBackup: false, dryRun: false);
+        DisplayTaggingResults(result, dryRun: false);
+
+        return result.FilesErrored > 0 ? 1 : 0;
+    }
+
+    static int HandleAutoSuggest(FileTaggingService taggingService, string baseDirectory, bool dryRun, bool backup)
+    {
+        Console.WriteLine("🤖 Auto-Suggest Mode");
+        Console.WriteLine();
+        Console.WriteLine("Analyzing project files...");
+        Console.WriteLine();
+
+        // Find all .cs files
+        var allFiles = Directory.GetFiles(baseDirectory, "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains("\\obj\\") && !f.Contains("\\bin\\"))
+            .ToList();
+
+        var suggestions = taggingService.SuggestProfiles(allFiles);
+        var grouped = suggestions.GroupBy(kvp => kvp.Value);
+
+        Console.WriteLine("📋 Suggested Profile Assignments:");
+        Console.WriteLine();
+
+        foreach (var group in grouped.OrderBy(g => g.Key))
+        {
+            Console.WriteLine($"Profile: {group.Key} ({group.Count()} files)");
+            foreach (var file in group.Take(5))
+            {
+                Console.WriteLine($"  • {Path.GetRelativePath(baseDirectory, file.Key)}");
+            }
+            if (group.Count() > 5)
+            {
+                Console.WriteLine($"  ... and {group.Count() - 5} more");
+            }
+            Console.WriteLine();
+        }
+
+        Console.Write("Apply these suggestions? (Y/n): ");
+        var confirm = Console.ReadLine()?.Trim().ToLowerInvariant();
+
+        if (confirm == "n" || confirm == "no")
+        {
+            Console.WriteLine("Cancelled.");
+            return 0;
+        }
+
+        // Apply suggestions by profile
+        var totalTagged = 0;
+        var totalSkipped = 0;
+        var totalErrors = 0;
+
+        foreach (var group in grouped)
+        {
+            var files = group.Select(kvp => kvp.Key).ToList();
+            var result = taggingService.TagFiles(files, group.Key, backup, dryRun);
+            
+            totalTagged += result.FilesTagged;
+            totalSkipped += result.FilesSkipped;
+            totalErrors += result.FilesErrored;
+        }
+
+        Console.WriteLine();
+        if (dryRun)
+        {
+            Console.WriteLine("✅ [DRY RUN] Would tag files:");
+        }
+        else
+        {
+            Console.WriteLine("✅ Tagging complete:");
+        }
+        Console.WriteLine($"   Tagged: {totalTagged}");
+        Console.WriteLine($"   Skipped: {totalSkipped} (already tagged)");
+        if (totalErrors > 0)
+        {
+            Console.WriteLine($"   Errors: {totalErrors}");
+        }
+
+        return totalErrors > 0 ? 1 : 0;
+    }
+
+    static void DisplayTaggingResults(FileTaggingService.TaggingResult result, bool dryRun)
+    {
+        if (result.FilesTagged > 0)
+        {
+            if (dryRun)
+            {
+                Console.WriteLine($"✅ [DRY RUN] Would tag {result.FilesTagged} file(s):");
+            }
+            else
+            {
+                Console.WriteLine($"✅ Tagged {result.FilesTagged} file(s):");
+            }
+            
+            foreach (var file in result.TaggedFiles.Take(10))
+            {
+                Console.WriteLine($"   • {Path.GetFileName(file)}");
+            }
+            if (result.TaggedFiles.Count > 10)
+            {
+                Console.WriteLine($"   ... and {result.TaggedFiles.Count - 10} more");
+            }
+            Console.WriteLine();
+        }
+
+        if (result.FilesSkipped > 0)
+        {
+            Console.WriteLine($"ℹ️  Skipped {result.FilesSkipped} file(s) (already tagged with same profile)");
+            Console.WriteLine();
+        }
+
+        if (result.FilesErrored > 0)
+        {
+            Console.WriteLine($"❌ Failed to tag {result.FilesErrored} file(s):");
+            foreach (var (file, error) in result.Errors)
+            {
+                Console.WriteLine($"   • {Path.GetFileName(file)}: {error}");
+            }
+            Console.WriteLine();
+        }
+
+        if (result.FilesMatched > 0)
+        {
+            Console.WriteLine($"Summary: {result.FilesTagged} tagged, {result.FilesSkipped} skipped, {result.FilesErrored} errors");
+        }
+    }
+
+    static PolicyConfiguration? TryLoadConfiguration()
+    {
+        try
+        {
+            if (File.Exists("coverbouncer.json"))
+            {
+                return ConfigurationLoader.LoadSmart("coverbouncer.json");
+            }
+        }
+        catch
+        {
+            // Ignore errors, return null
+        }
+        return null;
     }
     
     /// <summary>
