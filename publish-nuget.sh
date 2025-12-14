@@ -41,13 +41,24 @@ if [ -z "$NUGET_API_KEY" ]; then
     exit 1
 fi
 
+# Extract version from MSBuild project file
+VERSION=$(grep -oP '(?<=<Version>)[^<]+' src/CoverBouncer.MSBuild/CoverBouncer.MSBuild.csproj | head -1)
+
+if [ -z "$VERSION" ]; then
+    echo -e "${RED}Error: Could not extract version from project file${NC}"
+    exit 1
+fi
+
+echo "→ Detected version: $VERSION"
+echo ""
+
 # Check if packages exist
-if [ ! -f "nupkg/CoverBouncer.MSBuild.1.0.0-preview.1.nupkg" ]; then
+if [ ! -f "nupkg/CoverBouncer.MSBuild.$VERSION.nupkg" ]; then
     echo -e "${YELLOW}Warning: MSBuild package not found. Building packages...${NC}"
     ./build.sh pack
 fi
 
-if [ ! -f "nupkg/CoverBouncer.CLI.1.0.0-preview.1.nupkg" ]; then
+if [ ! -f "nupkg/CoverBouncer.CLI.$VERSION.nupkg" ]; then
     echo -e "${YELLOW}Warning: CLI package not found. Building packages...${NC}"
     ./build.sh pack
 fi
@@ -68,14 +79,14 @@ fi
 
 echo ""
 echo "→ Publishing CoverBouncer.MSBuild..."
-dotnet nuget push nupkg/CoverBouncer.MSBuild.1.0.0-preview.1.nupkg \
+dotnet nuget push nupkg/CoverBouncer.MSBuild.$VERSION.nupkg \
     --api-key "$NUGET_API_KEY" \
     --source https://api.nuget.org/v3/index.json \
     --skip-duplicate
 
 echo ""
 echo "→ Publishing CoverBouncer.CLI..."
-dotnet nuget push nupkg/CoverBouncer.CLI.1.0.0-preview.1.nupkg \
+dotnet nuget push nupkg/CoverBouncer.CLI.$VERSION.nupkg \
     --api-key "$NUGET_API_KEY" \
     --source https://api.nuget.org/v3/index.json \
     --skip-duplicate
@@ -88,6 +99,6 @@ echo "  1. Wait 5-10 minutes for NuGet indexing"
 echo "  2. Verify packages at:"
 echo "     - https://www.nuget.org/packages/CoverBouncer.MSBuild"
 echo "     - https://www.nuget.org/packages/CoverBouncer.CLI"
-echo "  3. Create GitHub release (v1.0.0-preview.1)"
+echo "  3. Create GitHub release (v$VERSION)"
 echo "  4. Test installation from NuGet.org"
 echo ""
