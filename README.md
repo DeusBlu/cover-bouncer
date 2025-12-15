@@ -242,8 +242,13 @@ Add to your test project's `.csproj`:
 ```xml
 <PropertyGroup>
   <EnableCoverBouncer>true</EnableCoverBouncer>
+  
+  <!-- Optional: Customize coverage report path -->
+  <!-- <CoverBouncerCoverageReport>$(MSBuildProjectDirectory)/custom/coverage.json</CoverBouncerCoverageReport> -->
 </PropertyGroup>
 ```
+
+**See [MSBuild Configuration](./docs/msbuild-configuration.md) for all available properties.**
 
 ### CLI Tool
 For manual validation or CI/CD scripts:
@@ -286,7 +291,8 @@ Run validation tests: `dotnet test tests/CoverBouncer.ValidationTests`
 
 - [Getting Started Guide](./docs/getting-started.md) - Complete setup walkthrough
 - [File Tagging Guide](./docs/tagging-guide.md) - Learn all the ways to tag files (manual & automated)
-- [Configuration Reference](./docs/configuration.md) - Detailed configuration options
+- [Configuration Reference](./docs/configuration.md) - Detailed `coverbouncer.json` options
+- [MSBuild Configuration](./docs/msbuild-configuration.md) - MSBuild properties & customization
 - [Coverlet Integration](./docs/coverlet-integration.md) - Best practices for Coverlet setup
 
 ## Contributing

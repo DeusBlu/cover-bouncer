@@ -5,17 +5,31 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0-preview.3] - 2025-12-14
+## [1.0.0-preview.4] - 2025-12-14
 
 ### Fixed
-- **Coverlet Instrumentation Warnings** 🔧
+- **Coverlet Instrumentation Warnings** 🔧 (CORRECT FIX)
   - Fixed `Mono.Cecil.Cil.SymbolsNotFoundException` warnings during test runs
-  - Added `ExcludeByFile` pattern to prevent Coverlet from instrumenting CoverBouncer assemblies
-  - No more missing symbol warnings for CoverBouncer.MSBuild.dll
+  - Now uses proper `<CoverletExcludeByFile>` ItemGroup instead of PropertyGroup
+  - Zero user configuration required - works automatically
 
-**Note:** Preview.2 has been unlisted due to this issue. Please upgrade to preview.3.
+### Added
+- **MSBuild Configuration Documentation** 📚
+  - New comprehensive `docs/msbuild-configuration.md`
+  - Documents all MSBuild properties: `EnableCoverBouncer`, `CoverBouncerCoverageReport`, `CoverBouncerConfigFile`, `CoverBouncerFailOnViolations`
+  - Common scenarios: custom coverage paths, shared configs, CI/CD setup
+  - Troubleshooting guide for coverage report path issues
+  - Updated README with link to MSBuild configuration docs
 
-## [1.0.0-preview.2] - 2025-12-13 [UNLISTED]
+**Note:** Preview.3 attempted to fix Coverlet warnings but used wrong approach (PropertyGroup). Preview.4 has the correct solution (ItemGroup).
+
+## [1.0.0-preview.3] - 2025-12-14 [DEPRECATED]
+
+### Fixed
+- ❌ Attempted to fix Coverlet warnings but used wrong approach (PropertyGroup instead of ItemGroup)
+- Please upgrade to preview.4
+
+## [1.0.0-preview.2] - 2025-12-13
 
 ### Added
 - **Automated File Tagging** 🏷️

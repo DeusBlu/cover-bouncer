@@ -17,11 +17,11 @@
 
   <!-- Automatically exclude CoverBouncer assemblies from Coverlet instrumentation -->
   <!-- This prevents warnings about missing symbols for CoverBouncer NuGet packages -->
-  <PropertyGroup>
-    <ExcludeByAttribute>$(ExcludeByAttribute);Obsolete;GeneratedCodeAttribute;CompilerGeneratedAttribute</ExcludeByAttribute>
-    <ExcludeByFile>$(ExcludeByFile);**/*CoverBouncer.*.dll</ExcludeByFile>
-    <Exclude>$(Exclude);[CoverBouncer.*]*</Exclude>
-  </PropertyGroup>
+  <ItemGroup>
+    <CoverletExcludeByFile Include="**/CoverBouncer.Core.dll" />
+    <CoverletExcludeByFile Include="**/CoverBouncer.Coverlet.dll" />
+    <CoverletExcludeByFile Include="**/CoverBouncer.MSBuild.dll" />
+  </ItemGroup>
 
   <!-- Load the task assembly -->
   <PropertyGroup>
