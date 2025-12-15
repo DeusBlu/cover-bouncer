@@ -5,7 +5,17 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.0.0-preview.3] - 2025-12-14
+
+### Fixed
+- **Coverlet Instrumentation Warnings** 🔧
+  - Fixed `Mono.Cecil.Cil.SymbolsNotFoundException` warnings during test runs
+  - Added `ExcludeByFile` pattern to prevent Coverlet from instrumenting CoverBouncer assemblies
+  - No more missing symbol warnings for CoverBouncer.MSBuild.dll
+
+**Note:** Preview.2 has been unlisted due to this issue. Please upgrade to preview.3.
+
+## [1.0.0-preview.2] - 2025-12-13 [UNLISTED]
 
 ### Added
 - **Automated File Tagging** 🏷️
