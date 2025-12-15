@@ -19,6 +19,7 @@
   <!-- This prevents warnings about missing symbols for CoverBouncer NuGet packages -->
   <PropertyGroup>
     <ExcludeByAttribute>$(ExcludeByAttribute);Obsolete;GeneratedCodeAttribute;CompilerGeneratedAttribute</ExcludeByAttribute>
+    <ExcludeByFile>$(ExcludeByFile);**/*CoverBouncer.*.dll</ExcludeByFile>
     <Exclude>$(Exclude);[CoverBouncer.*]*</Exclude>
   </PropertyGroup>
 
