@@ -7,7 +7,7 @@
     
     <!-- NuGet Package Settings -->
     <PackageId>CoverBouncer.MSBuild</PackageId>
-    <Version>1.0.0-preview.5</Version>
+    <Version>1.0.0-preview.6</Version>
     <Title>CoverBouncer - Profile-Based Coverage Enforcement</Title>
     <Description>MSBuild integration for CoverBouncer. Automatically enforces profile-based code coverage policies during dotnet test. Tag your files, set thresholds, and let the bouncer keep your coverage standards high.</Description>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy;msbuild;coverlet;test-coverage</PackageTags>

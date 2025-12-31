@@ -10,7 +10,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>coverbouncer</ToolCommandName>
     <PackageId>CoverBouncer.CLI</PackageId>
-    <Version>1.0.0-preview.5</Version>
+    <Version>1.0.0-preview.6</Version>
     <Title>CoverBouncer CLI</Title>
     <Description>Command-line tool for CoverBouncer. Use 'coverbouncer init' to generate configuration files and 'coverbouncer verify' to validate coverage policies.</Description>
     <PackageTags>coverage;testing;dotnet;csharp;tool;cli</PackageTags>
