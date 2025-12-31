@@ -36,20 +36,16 @@ This creates `coverbouncer.json` in your solution root with sensible defaults:
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
-      "minLine": 0.70,
-      "minBranch": 0.60
+      "minLine": 0.70
     },
     "BusinessLogic": {
-      "minLine": 0.90,
-      "minBranch": 0.80
+      "minLine": 0.90
     },
     "Critical": {
-      "minLine": 1.00,
-      "minBranch": 1.00
+      "minLine": 1.00
     },
     "Dto": {
-      "minLine": 0.00,
-      "minBranch": 0.00
+      "minLine": 0.00
     }
   }
 }
@@ -340,7 +336,7 @@ If your coverage report is in a different location:
 
 ```json
 {
-  "coverletReportPath": "coverage/results/coverage.json",
+  "coverageReportPath": "coverage/results/coverage.json",
   "profiles": { ... }
 }
 ```
@@ -381,7 +377,7 @@ You can define as many profiles as you need:
 Make sure:
 1. Coverlet is installed: `dotnet add package coverlet.msbuild`
 2. Coverage collection is enabled in your `.csproj`
-3. The `CoverletOutput` path matches `coverletReportPath` in config
+3. The `CoverletOutput` path matches `coverageReportPath` in config
 
 ### "No profile tag found"
 

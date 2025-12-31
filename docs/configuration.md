@@ -19,20 +19,16 @@ Cover-Bouncer uses a **single configuration file** with minimal required setting
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
-      "minLine": 0.70,
-      "minBranch": 0.60
+      "minLine": 0.70
     },
     "BusinessLogic": {
-      "minLine": 0.90,
-      "minBranch": 0.80
+      "minLine": 0.90
     },
     "Critical": {
-      "minLine": 1.00,
-      "minBranch": 1.00
+      "minLine": 1.00
     },
     "Dto": {
-      "minLine": 0.00,
-      "minBranch": 0.00
+      "minLine": 0.00
     }
   }
 }
@@ -87,8 +83,8 @@ Dictionary of profile name → coverage thresholds.
 
 **Each profile can specify:**
 - `minLine` (decimal 0.0-1.0) - Minimum line coverage required
-- `minBranch` (decimal 0.0-1.0) - Minimum branch coverage required
-- `minMethod` (decimal 0.0-1.0) - Minimum method coverage required (optional)
+
+> **Note:** Branch and method coverage support is planned for a future release (MVP currently supports line coverage only).
 
 **Threshold values:**
 - `0.00` = 0% (no coverage required)
@@ -101,17 +97,13 @@ Dictionary of profile name → coverage thresholds.
 {
   "profiles": {
     "Standard": {
-      "minLine": 0.70,
-      "minBranch": 0.60
+      "minLine": 0.70
     },
     "Critical": {
-      "minLine": 1.00,
-      "minBranch": 1.00,
-      "minMethod": 1.00
+      "minLine": 1.00
     },
     "Dto": {
-      "minLine": 0.00,
-      "minBranch": 0.00
+      "minLine": 0.00
     }
   }
 }
@@ -149,12 +141,10 @@ This assumes:
   "defaultProfile": "High",
   "profiles": {
     "High": {
-      "minLine": 0.90,
-      "minBranch": 0.85
+      "minLine": 0.90
     },
     "Critical": {
-      "minLine": 1.00,
-      "minBranch": 1.00
+      "minLine": 1.00
     }
   }
 }
@@ -166,12 +156,10 @@ This assumes:
   "defaultProfile": "Low",
   "profiles": {
     "Low": {
-      "minLine": 0.50,
-      "minBranch": 0.40
+      "minLine": 0.50
     },
     "Important": {
-      "minLine": 0.80,
-      "minBranch": 0.70
+      "minLine": 0.80
     }
   }
 }
@@ -183,24 +171,19 @@ This assumes:
   "defaultProfile": "Standard",
   "profiles": {
     "Standard": {
-      "minLine": 0.70,
-      "minBranch": 0.60
+      "minLine": 0.70
     },
     "BusinessLogic": {
-      "minLine": 0.90,
-      "minBranch": 0.80
+      "minLine": 0.90
     },
     "Critical": {
-      "minLine": 1.00,
-      "minBranch": 1.00
+      "minLine": 1.00
     },
     "Dto": {
-      "minLine": 0.00,
-      "minBranch": 0.00
+      "minLine": 0.00
     },
     "Generated": {
-      "minLine": 0.00,
-      "minBranch": 0.00
+      "minLine": 0.00
     }
   }
 }

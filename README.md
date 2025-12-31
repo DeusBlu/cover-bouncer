@@ -207,27 +207,26 @@ See [Coverlet documentation](https://github.com/coverlet-coverage/coverlet/blob/
 
 ```json
 {
+  "coverageReportPath": "TestResults/coverage.json",
   "defaultProfile": "Standard",
   "profiles": {
     "Critical": {
-      "lineCoverageThreshold": 90.0,
-      "description": "Business-critical code (payment, security, etc.)"
+      "minLine": 0.90
     },
     "Standard": {
-      "lineCoverageThreshold": 60.0,
-      "description": "Regular application code"
+      "minLine": 0.60
     },
     "Integration": {
-      "lineCoverageThreshold": 40.0,
-      "description": "External service adapters"
+      "minLine": 0.40
     },
     "Dto": {
-      "lineCoverageThreshold": 0.0,
-      "description": "Data transfer objects"
+      "minLine": 0.00
     }
   }
 }
 ```
+
+> **Note:** Values are decimals (0.0-1.0), not percentages. So 0.90 = 90% line coverage.
 
 ## Installation & Usage
 
