@@ -47,6 +47,55 @@ Standard coverage tools give you one number: "X% coverage." But not all code is 
 
 The built-in templates (Basic, Strict, Relaxed) are just **suggestions** to get you started. Feel free to customize them to match your team's current reality and goals.
 
+## 🚀 Adoption Path (Recommended)
+
+Don't try to tag everything at once! Here's a proven path to success:
+
+### Step 1: Start with ONE Critical File
+Pick your most important file (payments, auth, etc.) and tag it:
+```csharp
+// [CoverageProfile("Critical")]
+public class PaymentProcessor { }
+```
+
+### Step 2: Add Profiles by Area
+Create profiles that match your codebase architecture:
+```json
+{
+  "defaultProfile": "Standard",
+  "profiles": {
+    "Critical": { "minLine": 0.90 },      // Payments, Auth, Security
+    "Core": { "minLine": 0.80 },          // Business logic
+    "Standard": { "minLine": 0.60 },      // Everything else
+    "Dto": { "minLine": 0.0 }             // Data objects
+  }
+}
+```
+
+### Step 3: Make Critical a Hard Gate in CI
+Start enforcing only your most important code:
+```xml
+<!-- Only fail builds for Critical violations initially -->
+<PropertyGroup>
+  <EnableCoverBouncer>true</EnableCoverBouncer>
+</PropertyGroup>
+```
+
+### Step 4: Expand Gradually
+Once Critical is stable, expand to more areas:
+```bash
+# Week 2: Tag your core business logic
+dotnet coverbouncer tag --path "./Core" --profile Core
+
+# Week 3: Tag standard application code  
+dotnet coverbouncer tag --pattern "**/*Service.cs" --profile Standard
+
+# Week 4: Tag DTOs to exclude from coverage requirements
+dotnet coverbouncer tag --pattern "**/*Dto.cs" --profile Dto
+```
+
+**Pro tip:** Use `--dry-run` to preview changes before applying them!
+
 ## Quick Start
 
 ### 1. Install
