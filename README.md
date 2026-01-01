@@ -49,43 +49,40 @@ The built-in templates (Basic, Strict, Relaxed) are just **suggestions** to get 
 
 ## 🚀 Adoption Path (Recommended)
 
-Don't try to tag everything at once! Here's a proven path to success:
+Don't try to tag everything at once! CoverBouncer defaults to **no coverage enforcement** so you can adopt gradually.
 
-### Step 1: Start with ONE Critical File
+### Step 1: Install and Initialize
+```bash
+dotnet add MyApp.Tests package CoverBouncer.MSBuild
+dotnet coverbouncer init
+```
+Your build will pass immediately - untagged files default to `NoCoverage` (0%).
+
+### Step 2: Tag ONE Critical File
 Pick your most important file (payments, auth, etc.) and tag it:
 ```csharp
 // [CoverageProfile("Critical")]
 public class PaymentProcessor { }
 ```
 
-### Step 2: Add Profiles by Area
-Create profiles that match your codebase architecture:
+### Step 3: Customize Profiles (Optional)
+Adjust thresholds to match your codebase:
 ```json
 {
-  "defaultProfile": "Standard",
+  "defaultProfile": "NoCoverage",
   "profiles": {
     "Critical": { "minLine": 0.90 },      // Payments, Auth, Security
-    "Core": { "minLine": 0.80 },          // Business logic
-    "Standard": { "minLine": 0.60 },      // Everything else
-    "Dto": { "minLine": 0.0 }             // Data objects
+    "Standard": { "minLine": 0.60 },      // Code you want tested
+    "NoCoverage": { "minLine": 0.0 }      // Default - no enforcement
   }
 }
-```
-
-### Step 3: Make Critical a Hard Gate in CI
-Start enforcing only your most important code:
-```xml
-<!-- Only fail builds for Critical violations initially -->
-<PropertyGroup>
-  <EnableCoverBouncer>true</EnableCoverBouncer>
-</PropertyGroup>
 ```
 
 ### Step 4: Expand Gradually
 Once Critical is stable, expand to more areas:
 ```bash
 # Week 2: Tag your core business logic
-dotnet coverbouncer tag --path "./Core" --profile Core
+dotnet coverbouncer tag --path "./Core" --profile Standard
 
 # Week 3: Tag standard application code  
 dotnet coverbouncer tag --pattern "**/*Service.cs" --profile Standard
@@ -123,7 +120,9 @@ Add to `Directory.Build.props`:
 </PropertyGroup>
 ```
 
-### 4. Tag Your Files
+### 4. Tag Your Files (Optional!)
+
+> **Note:** Untagged files automatically use your `defaultProfile`. You can start with zero tags and add them later for files needing different thresholds.
 
 You can tag files manually or use the CLI tagging features:
 

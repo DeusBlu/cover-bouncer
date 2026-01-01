@@ -16,22 +16,18 @@ Cover-Bouncer uses a **single configuration file** with minimal required setting
 ```json
 {
   "coverageReportPath": "TestResults/coverage.json",
-  "defaultProfile": "Standard",
+  "defaultProfile": "NoCoverage",
   "profiles": {
-    "Standard": {
-      "minLine": 0.70
-    },
-    "BusinessLogic": {
-      "minLine": 0.90
-    },
-    "Critical": {
-      "minLine": 1.00
-    },
-    "Dto": {
-      "minLine": 0.00
-    }
+    "Critical": { "minLine": 1.00 },
+    "BusinessLogic": { "minLine": 0.80 },
+    "Standard": { "minLine": 0.60 },
+    "Dto": { "minLine": 0.00 },
+    "NoCoverage": { "minLine": 0.00 }
   }
 }
+```
+
+> **Note:** The default profile is `NoCoverage` (0%) so your build won't fail on first install. This allows you to adopt coverage enforcement gradually by tagging files with stricter profiles.
 ```
 
 ---
@@ -62,7 +58,9 @@ Path to the Coverlet JSON coverage report output.
 **Type:** `string`  
 **Required:** Yes
 
-The profile name applied to files that don't have an explicit `[CoverageProfile("...")]` tag.
+The profile name applied to **all files that don't have an explicit `[CoverageProfile("...")]` tag**.
+
+> **Important:** This is how CoverBouncer handles untagged files. If you don't tag a file, it automatically uses the `defaultProfile` threshold. This means you can start using CoverBouncer immediately without tagging any files - all files will be evaluated against your default profile.
 
 **Must match a key in the `profiles` object.**
 
@@ -117,11 +115,9 @@ The absolute minimum valid configuration:
 
 ```json
 {
-  "defaultProfile": "Standard",
+  "defaultProfile": "NoCoverage",
   "profiles": {
-    "Standard": {
-      "minLine": 0.70
-    }
+    "NoCoverage": { "minLine": 0.00 }
   }
 }
 ```
@@ -129,7 +125,9 @@ The absolute minimum valid configuration:
 This assumes:
 - Coverlet outputs to `TestResults/coverage.json`
 - You only care about line coverage
-- All files use the `Standard` profile
+- **All untagged files have no coverage requirement (0%)**
+
+> **Note:** With this config you're effectively in "audit mode" - CoverBouncer will report coverage but won't fail builds. Tag files with profiles like `Standard` or `Critical` to start enforcing thresholds.
 
 ---
 

@@ -14,6 +14,30 @@ namespace MyApp.Services
 }
 ```
 
+## What Happens to Untagged Files?
+
+**Untagged files automatically use the `defaultProfile` from your `coverbouncer.json`.**
+
+This means:
+- ✅ You can start using CoverBouncer immediately without tagging any files
+- ✅ All files are evaluated against your default threshold
+- ✅ You only need to tag files that require a *different* threshold
+
+**Example output showing untagged files:**
+```
+Coverage Summary by Profile
+─────────────────────────────────────────
+  ✅ Critical: 3 passed, 0 failed (100% required)
+  ❌ Standard: 5 passed, 2 failed (60% required)
+  ✅ NoCoverage (default): 15 passed, 0 failed (exempt)
+
+  ℹ️  15 file(s) untagged → using 'NoCoverage' profile
+     Tip: Tag files with // [CoverageProfile("ProfileName")] for explicit control
+─────────────────────────────────────────
+```
+
+> **Note:** The default profile is `NoCoverage` (0%), so untagged files won't cause build failures. Tag files with `Standard`, `BusinessLogic`, or `Critical` to opt-in to coverage enforcement.
+
 For small projects, manual tagging works fine. For larger projects, use the CLI's automated tagging features.
 
 ## Manual Tagging

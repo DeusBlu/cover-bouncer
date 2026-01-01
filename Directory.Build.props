@@ -28,4 +28,9 @@
     <!-- Source link support -->
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
   </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Coverlet exclusions: Exclude test frameworks and mocking libraries from coverage -->
+    <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
+  </PropertyGroup>
 </Project>

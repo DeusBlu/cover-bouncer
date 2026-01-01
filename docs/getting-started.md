@@ -33,23 +33,18 @@ This creates `coverbouncer.json` in your solution root with sensible defaults:
 ```json
 {
   "coverageReportPath": "TestResults/coverage.json",
-  "defaultProfile": "Standard",
+  "defaultProfile": "NoCoverage",
   "profiles": {
-    "Standard": {
-      "minLine": 0.70
-    },
-    "BusinessLogic": {
-      "minLine": 0.90
-    },
-    "Critical": {
-      "minLine": 1.00
-    },
-    "Dto": {
-      "minLine": 0.00
-    }
+    "Critical": { "minLine": 1.00 },
+    "BusinessLogic": { "minLine": 0.80 },
+    "Standard": { "minLine": 0.60 },
+    "Dto": { "minLine": 0.00 },
+    "NoCoverage": { "minLine": 0.00 }
   }
 }
 ```
+
+> **Note:** The default is `NoCoverage` (0%) so your build won't fail on first install. Tag files with stricter profiles to opt-in to coverage enforcement.
 
 **That's all the configuration you need!** No sprawl, no complexity.
 
@@ -111,7 +106,9 @@ Add the following to your test project's `.csproj` file or create a `Directory.B
 dotnet add package coverlet.msbuild
 ```
 
-### Step 4: Tag Your Source Files
+### Step 4: Tag Your Source Files (Optional!)
+
+> **Untagged files use your `defaultProfile` automatically.** You can run CoverBouncer right now without any tags - all files will be checked against your default threshold. Add tags later only for files that need different thresholds.
 
 You can tag files manually or use the automated CLI tools.
 

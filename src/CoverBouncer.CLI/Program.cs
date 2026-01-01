@@ -92,12 +92,14 @@ class Program
             Console.WriteLine($"✅ Created {output} with '{template}' template");
             Console.WriteLine();
             Console.WriteLine("Built-in profiles:");
-            Console.WriteLine("  • Critical (100% line coverage)");
-            Console.WriteLine("  • BusinessLogic (80% line coverage)");
+            Console.WriteLine("  • NoCoverage (0% - default, no requirements)");
             Console.WriteLine("  • Standard (60% line coverage)");
-            Console.WriteLine("  • Dto (0% - no requirements)");
+            Console.WriteLine("  • BusinessLogic (80% line coverage)");
+            Console.WriteLine("  • Critical (100% line coverage)");
+            Console.WriteLine("  • Dto (0% - for data objects)");
             Console.WriteLine();
-            Console.WriteLine("Tag files with: [CoverageProfile(\"ProfileName\")]");
+            Console.WriteLine("ℹ️  Default is NoCoverage - your build won't fail until you tag files.");
+            Console.WriteLine("   Tag files with: // [CoverageProfile(\"Standard\")]");
             Console.WriteLine();
             
             // Check for Coverlet and offer to configure exclusions
@@ -147,17 +149,73 @@ class Program
             var parser = new CoverletReportParser();
             var coverageReport = parser.ParseFile(coverage);
             
-            // Read profile tags from source files
+            // Read profile tags from source files and track tagging stats
             var tagReader = new FileTagReader();
+            var taggedFiles = new Dictionary<string, List<FileCoverage>>();
+            var untaggedFiles = new List<FileCoverage>();
+            
             foreach (var (filePath, fileCoverage) in coverageReport.Files)
             {
-                fileCoverage.AssignedProfile = tagReader.ReadProfileTag(filePath);
+                var tag = tagReader.ReadProfileTag(filePath);
+                fileCoverage.AssignedProfile = tag;
+                
+                var effectiveProfile = tag ?? policyConfig.DefaultProfile;
+                
+                if (tag == null)
+                {
+                    untaggedFiles.Add(fileCoverage);
+                }
+                
+                if (!taggedFiles.ContainsKey(effectiveProfile))
+                {
+                    taggedFiles[effectiveProfile] = new List<FileCoverage>();
+                }
+                taggedFiles[effectiveProfile].Add(fileCoverage);
             }
             
             // Validate
             var engine = new PolicyEngine();
             var result = engine.Validate(policyConfig, coverageReport);
             
+            // Build profile summary
+            var profileSummary = new Dictionary<string, (int passed, int failed, decimal threshold)>();
+            foreach (var (profileName, files) in taggedFiles)
+            {
+                var threshold = policyConfig.Profiles.TryGetValue(profileName, out var t) ? t.MinLine : 0;
+                var violations = result.Violations.Where(v => v.ProfileName == profileName).Select(v => v.FilePath).ToHashSet();
+                var passed = files.Count(f => !violations.Contains(f.FilePath));
+                var failed = files.Count - passed;
+                profileSummary[profileName] = (passed, failed, threshold);
+            }
+
+            // Output summary
+            Console.WriteLine();
+            Console.WriteLine("Coverage Summary by Profile");
+            Console.WriteLine("─────────────────────────────────────────");
+            
+            foreach (var (profileName, (passed, failed, threshold)) in profileSummary.OrderBy(p => p.Key))
+            {
+                var status = failed == 0 ? "✅" : "❌";
+                var thresholdStr = threshold == 0 ? "exempt" : $"{threshold:P0} required";
+                var isDefault = profileName == policyConfig.DefaultProfile;
+                var defaultMarker = isDefault ? " (default)" : "";
+                
+                Console.WriteLine($"  {status} {profileName}{defaultMarker}: {passed} passed, {failed} failed ({thresholdStr})");
+            }
+            
+            Console.WriteLine();
+            if (untaggedFiles.Count > 0)
+            {
+                Console.WriteLine($"  ℹ️  {untaggedFiles.Count} file(s) untagged → using '{policyConfig.DefaultProfile}' profile");
+                Console.WriteLine($"     Tip: Tag files with // [CoverageProfile(\"ProfileName\")] for explicit control");
+            }
+            else
+            {
+                Console.WriteLine("  ✅ All files explicitly tagged");
+            }
+            Console.WriteLine("─────────────────────────────────────────");
+            Console.WriteLine();
+
             // Output results
             if (result.Success)
             {
@@ -166,7 +224,7 @@ class Program
             }
             else
             {
-                Console.WriteLine($"❌ Coverage policy violations found ({result.Violations.Count} of {result.TotalFilesChecked} files)");
+                Console.WriteLine($"❌ {result.Violations.Count} coverage violation(s) found");
                 Console.WriteLine();
                 
                 // Group violations by profile
@@ -174,16 +232,25 @@ class Program
                 
                 foreach (var group in byProfile.OrderBy(g => g.Key))
                 {
-                    Console.WriteLine($"Profile: {group.Key}");
+                    var threshold = policyConfig.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
+                    Console.WriteLine($"  Profile: {group.Key} (requires {threshold:P0} line coverage)");
+                    
                     foreach (var violation in group.OrderBy(v => v.FilePath))
                     {
-                        Console.WriteLine($"  {violation.FilePath}");
-                        Console.WriteLine($"    Required: {violation.RequiredCoverage:P0}, Actual: {violation.ActualCoverage:P1}");
+                        var fileName = Path.GetFileName(violation.FilePath);
+                        var gap = violation.RequiredCoverage - violation.ActualCoverage;
+                        Console.WriteLine($"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
                     }
                     Console.WriteLine();
                 }
+
+                // Actionable suggestions
+                Console.WriteLine("💡 How to fix:");
+                Console.WriteLine("   • Add tests to increase coverage for failing files");
+                Console.WriteLine("   • Or lower the threshold by tagging with a less strict profile:");
+                Console.WriteLine("     // [CoverageProfile(\"Standard\")]  // or \"Dto\" for 0% requirement");
+                Console.WriteLine();
                 
-                Console.WriteLine($"Summary: {result.FilesPassed} passed, {result.Violations.Count} failed");
                 return 1;
             }
         }
