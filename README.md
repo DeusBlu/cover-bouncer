@@ -182,12 +182,87 @@ Coverage policy automatically enforced! ✅
 - 🎯 **Profile-Based Coverage** - Different thresholds for different code types
 - 🤖 **Smart Tagging** - Interactive, batch, and auto-suggest modes for tagging files
 - 🔌 **Drop-In Integration** - Works with your existing `dotnet test` workflow
+- 🔍 **Filtered Run Support** - `dotnet test --filter` works without false failures
 - 🚫 **CI/CD Ready** - Blocks merges when coverage drops below thresholds
 - 📦 **NuGet Packaged** - Easy to install and distribute
 - 🏷️ **File-Level Tags** - Simple attribute-based profile assignment
 - ⚙️ **Single Config File** - No configuration sprawl
 - 🔧 **Auto-Configuration** - Automatically excludes CoverBouncer from coverage
 - 🎨 **Fully Customizable** - Use any profile names and thresholds you want
+
+## 🔍 Filtered Test Runs (`--filter`)
+
+Running `dotnet test --filter "Category=Unit"` or any `--filter` expression? **CoverBouncer handles it automatically.**
+
+### The Problem
+
+When you use `--filter`, Coverlet still instruments the **entire assembly**. Files not targeted by the filtered tests appear with 0% coverage, even though no tests were supposed to run against them. Without awareness, CoverBouncer would report false failures for every untargeted file.
+
+### How CoverBouncer Solves It
+
+CoverBouncer automatically detects filtered test runs via the `$(VSTestTestCaseFilter)` MSBuild property. When a filter is active, files with zero covered lines are **skipped** — they were instrumented but not targeted.
+
+**No configuration needed** — it just works.
+
+### Example: Same Coverage Data, Different Modes
+
+**Filtered run** (`dotnet test --filter "Category=OrderTests"`):
+```
+ℹ️  Filtered test run mode: files with zero coverage will be skipped
+Coverage Summary by Profile
+─────────────────────────────────────────
+  ✅ BusinessLogic: 1 passed, 0 failed (80% required)
+  ✅ Critical: 1 passed, 0 failed (100% required)
+  ⏭️  4 file(s) skipped (no coverage data in filtered test run)
+─────────────────────────────────────────
+✅ All 2 files passed coverage requirements
+```
+
+**Full run** (`dotnet test`, same data):
+```
+Coverage Summary by Profile
+─────────────────────────────────────────
+  ❌ BusinessLogic: 1 passed, 1 failed (80% required)
+  ❌ Critical: 1 passed, 1 failed (100% required)
+  ✅ Dto: 1 passed, 0 failed (exempt)
+  ❌ Standard (default): 0 passed, 1 failed (60% required)
+─────────────────────────────────────────
+❌ 3 coverage violation(s) found
+```
+
+### ⚠️ Best Practice: Use Full Runs as Your CI Gate
+
+Filtered runs are great for **fast local feedback** — validate just the files you're working on. But only a **full run** validates coverage across your entire codebase.
+
+**Recommended CI setup:**
+```yaml
+jobs:
+  quick-check:
+    # Fast feedback on PRs — only validates targeted files
+    run: dotnet test --filter "Category=Unit"
+
+  coverage-gate:
+    # Final gate — validates ALL coverage thresholds
+    run: dotnet test
+```
+
+### How It Works Under the Hood
+
+| Situation | CoveredLines | Filtered Run | Full Run |
+|-----------|-------------|--------------|----------|
+| File targeted by tests, meets threshold | > 0 | ✅ Pass | ✅ Pass |
+| File targeted by tests, below threshold | > 0 | ❌ Fail | ❌ Fail |
+| File NOT targeted (not in filter) | 0 | ⏭️ Skip | ❌ Fail |
+| File with Dto profile (0% allowed) | 0 | ⏭️ Skip | ✅ Pass |
+
+**Key insight:** On a filtered run, there's no way to distinguish "file not in the filter" from "file genuinely has no tests." That's why the full run is essential as your final gate — it catches files that truly need tests.
+
+### CLI Usage
+
+For CLI usage (outside MSBuild), pass the `--filtered` flag:
+```bash
+coverbouncer verify --coverage coverage.json --config coverbouncer.json --filtered
+```
 
 ## Coverlet Integration
 
@@ -315,6 +390,8 @@ This project includes comprehensive validation tests:
 - ✅ Multiple profile scenarios
 - ✅ Edge cases (exact thresholds, zero coverage)
 - ✅ Real-world project simulation
+- ✅ **Filtered test run** (untargeted files skipped)
+- ✅ **Full run with same data** (contrast — same data fails without filter awareness)
 
 Run validation tests: `dotnet test tests/CoverBouncer.ValidationTests`
 

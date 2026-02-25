@@ -7,7 +7,7 @@
     
     <!-- NuGet Package Settings -->
     <PackageId>CoverBouncer.MSBuild</PackageId>
-    <Version>1.0.0-preview.7</Version>
+    <Version>1.0.0-preview.8</Version>
     <Title>CoverBouncer - Profile-Based Coverage Enforcement</Title>
     <Description>MSBuild integration for CoverBouncer. Automatically enforces profile-based code coverage policies during dotnet test. Tag your files, set thresholds, and let the bouncer keep your coverage standards high.</Description>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy;msbuild;coverlet;test-coverage</PackageTags>
@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Fixed Coverlet instrumentation warnings using CoverletExcludeByFile ItemGroup (preview.3 had wrong approach).</PackageReleaseNotes>
+    <PackageReleaseNotes>Filtered test runs (--filter) no longer cause false failures. Auto-detects via $(VSTestTestCaseFilter). CLI adds --filtered flag.</PackageReleaseNotes>
     
     <!-- MSBuild Task Package Settings -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>

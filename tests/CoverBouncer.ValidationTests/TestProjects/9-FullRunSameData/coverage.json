@@ -1,0 +1,92 @@
+{
+  "FilteredRunDemo.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\PaymentService.cs": {
+      "FilteredRunDemo.Services.PaymentService": {
+        "ProcessPayment(System.Decimal)": {
+          "Lines": { "10": 3, "11": 3 },
+          "Branches": []
+        },
+        "ValidateCard(System.String)": {
+          "Lines": { "12": 2 },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\OrderService.cs": {
+      "FilteredRunDemo.Services.OrderService": {
+        "CreateOrder(System.Int32)": {
+          "Lines": { "10": 2, "11": 2 },
+          "Branches": []
+        },
+        "CalculateTotal(System.Decimal, System.Int32)": {
+          "Lines": { "12": 1 },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\AuthenticationService.cs": {
+      "FilteredRunDemo.Services.AuthenticationService": {
+        "Authenticate(System.String, System.String)": {
+          "Lines": { "12": 0 },
+          "Branches": []
+        },
+        "Logout(System.String)": {
+          "Lines": { "13": 0 },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\InventoryService.cs": {
+      "FilteredRunDemo.Services.InventoryService": {
+        "GetStock(System.Int32)": {
+          "Lines": { "12": 0 },
+          "Branches": []
+        },
+        "UpdateStock(System.Int32, System.Int32)": {
+          "Lines": { "13": 0 },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\Logger.cs": {
+      "FilteredRunDemo.Infrastructure.Logger": {
+        "Log(System.String)": {
+          "Lines": { "10": 0 },
+          "Branches": []
+        },
+        "Debug(System.String)": {
+          "Lines": { "11": 0 },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\8-FilteredRun\\src\\UserDto.cs": {
+      "FilteredRunDemo.Models.UserDto": {
+        "get_Id()": {
+          "Lines": { "11": 0 },
+          "Branches": []
+        },
+        "set_Id(System.Int32)": {
+          "Lines": { "11": 0 },
+          "Branches": []
+        },
+        "get_Name()": {
+          "Lines": { "12": 0 },
+          "Branches": []
+        },
+        "set_Name(System.String)": {
+          "Lines": { "12": 0 },
+          "Branches": []
+        },
+        "get_Email()": {
+          "Lines": { "13": 0 },
+          "Branches": []
+        },
+        "set_Email(System.String)": {
+          "Lines": { "13": 0 },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

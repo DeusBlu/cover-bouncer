@@ -325,6 +325,36 @@ test:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 ```
 
+### ⚠️ Using `--filter` in CI? Read This!
+
+If your CI pipeline uses `dotnet test --filter` for fast feedback (e.g., running only unit tests on PRs), CoverBouncer **automatically detects** the filter and skips files with 0% coverage.
+
+**This means:**
+- ✅ Filtered runs won't produce false failures for untargeted files
+- ✅ Files that ARE targeted by the filter are still fully validated
+- ⚠️ Only a **full run** (no `--filter`) validates ALL files against ALL thresholds
+
+**Recommended CI pattern:**
+```yaml
+jobs:
+  # Fast feedback — filtered run on every push
+  quick-tests:
+    steps:
+      - run: dotnet test --filter "Category=Unit"
+      # CoverBouncer validates only targeted files ✅
+      # Untargeted files skipped (would show 0% from Coverlet instrumentation) ⏭️
+
+  # Full coverage gate — on PRs or before merge
+  coverage-gate:
+    steps:
+      - run: dotnet test
+      # ALL files validated — this is your real coverage gate ✅
+```
+
+**Why both?** Filtered runs give developers fast feedback on the files they're working on. Full runs ensure nothing slips through. Think of it as "spot check vs full audit."
+
+For more details on how filtered runs work, see [README - Filtered Test Runs](../README.md#-filtered-test-runs---filter).
+
 ## Advanced Configuration
 
 ### Custom Report Paths

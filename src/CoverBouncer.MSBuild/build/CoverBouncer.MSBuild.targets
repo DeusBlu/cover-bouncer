@@ -55,7 +55,8 @@
       CoverageReportPath="$(CoverBouncerCoverageReport)"
       ConfigPath="$(CoverBouncerConfigFile)"
       ProjectDirectory="$(MSBuildProjectDirectory)"
-      FailOnViolations="$(CoverBouncerFailOnViolations)" />
+      FailOnViolations="$(CoverBouncerFailOnViolations)"
+      TestCaseFilter="$(VSTestTestCaseFilter)" />
   </Target>
 
 </Project>

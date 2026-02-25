@@ -1,0 +1,37 @@
+{
+  "TestApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\3-CriticalViolation\\src\\SecurityValidator.cs": {
+      "TestApp.SecurityValidator": {
+        "ValidateToken(System.String)": {
+          "Lines": {
+            "11": 2,
+            "12": 1,
+            "14": 1
+          },
+          "Branches": []
+        },
+        "CheckPermissions(System.String, System.String)": {
+          "Lines": {
+            "19": 2,
+            "20": 1,
+            "22": 1
+          },
+          "Branches": []
+        },
+        "AuditSecurityEvent(System.String, System.String)": {
+          "Lines": {
+            "28": 0,
+            "29": 0
+          },
+          "Branches": []
+        },
+        "EncryptData(System.String)": {
+          "Lines": {
+            "35": 0
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

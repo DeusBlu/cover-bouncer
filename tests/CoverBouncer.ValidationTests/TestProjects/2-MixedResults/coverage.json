@@ -1,0 +1,80 @@
+{
+  "TestApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\2-MixedResults\\src\\AuthService.cs": {
+      "TestApp.AuthService": {
+        "ValidateUser(System.String, System.String)": {
+          "Lines": {
+            "11": 3,
+            "12": 1,
+            "14": 2,
+            "15": 1,
+            "17": 1
+          },
+          "Branches": []
+        },
+        "GenerateToken(System.String)": {
+          "Lines": {
+            "22": 1
+          },
+          "Branches": []
+        },
+        "RevokeToken(System.String)": {
+          "Lines": {
+            "28": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\2-MixedResults\\src\\EmailSender.cs": {
+      "TestApp.EmailSender": {
+        "SendEmail(System.String, System.String, System.String)": {
+          "Lines": {
+            "10": 2,
+            "11": 1,
+            "13": 1,
+            "14": 1
+          },
+          "Branches": []
+        },
+        "SendBulkEmails(System.Collections.Generic.List`1<System.String>)": {
+          "Lines": {
+            "19": 0,
+            "20": 0,
+            "21": 0,
+            "22": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\2-MixedResults\\src\\Logger.cs": {
+      "TestApp.Logger": {
+        "LogInfo(System.String)": {
+          "Lines": {
+            "10": 2
+          },
+          "Branches": []
+        },
+        "LogWarning(System.String)": {
+          "Lines": {
+            "16": 0
+          },
+          "Branches": []
+        },
+        "LogError(System.String)": {
+          "Lines": {
+            "21": 0
+          },
+          "Branches": []
+        },
+        "LogDebug(System.String)": {
+          "Lines": {
+            "26": 0
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

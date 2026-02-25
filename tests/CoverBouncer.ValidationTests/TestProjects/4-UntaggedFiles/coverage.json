@@ -1,0 +1,54 @@
+{
+  "TestApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\4-UntaggedFiles\\src\\Helper1.cs": {
+      "TestApp.Helper1": {
+        "FormatName(System.String, System.String)": {
+          "Lines": {
+            "10": 2
+          },
+          "Branches": []
+        },
+        "Add(System.Int32, System.Int32)": {
+          "Lines": {
+            "15": 2
+          },
+          "Branches": []
+        },
+        "LogOperation(System.String)": {
+          "Lines": {
+            "21": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\4-UntaggedFiles\\src\\Helper2.cs": {
+      "TestApp.Helper2": {
+        "ToUpper(System.String)": {
+          "Lines": {
+            "11": 2
+          },
+          "Branches": []
+        },
+        "ToLower(System.String)": {
+          "Lines": {
+            "17": 0
+          },
+          "Branches": []
+        },
+        "Trim(System.String)": {
+          "Lines": {
+            "22": 0
+          },
+          "Branches": []
+        },
+        "IsEmpty(System.String)": {
+          "Lines": {
+            "27": 0
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

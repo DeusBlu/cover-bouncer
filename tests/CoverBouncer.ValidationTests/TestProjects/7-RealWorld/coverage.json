@@ -1,0 +1,51 @@
+{
+  "RealApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Core\\AuthenticationService.cs": {
+      "RealApp.Core.Security.AuthenticationService": {
+        "Authenticate(System.String, System.String)": { "Lines": { "3": 2 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Core\\AuthorizationService.cs": {
+      "RealApp.Core.Security.AuthorizationService": {
+        "Authorize(System.String, System.String)": { "Lines": { "3": 2 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Business\\OrderService.cs": {
+      "RealApp.Business.OrderService": {
+        "CreateOrder(System.Int32)": { "Lines": { "3": 2 }, "Branches": [] },
+        "Cancel(System.Int32)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Business\\InventoryService.cs": {
+      "RealApp.Business.InventoryService": {
+        "GetStock(System.Int32)": { "Lines": { "3": 2 }, "Branches": [] },
+        "UpdateStock(System.Int32, System.Int32)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Models\\OrderDto.cs": {
+      "RealApp.Models.OrderDto": {
+        "get_Id()": { "Lines": { "3": 0 }, "Branches": [] },
+        "set_Id(System.Int32)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Models\\ProductDto.cs": {
+      "RealApp.Models.ProductDto": {
+        "get_Id()": { "Lines": { "3": 0 }, "Branches": [] },
+        "set_Id(System.Int32)": { "Lines": { "3": 0 }, "Branches": [] },
+        "get_Price()": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Infrastructure\\Logger.cs": {
+      "RealApp.Infrastructure.Logger": {
+        "Log(System.String)": { "Lines": { "3": 2 }, "Branches": [] },
+        "Debug(System.String)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\7-RealWorld\\src\\Infrastructure\\EmailService.cs": {
+      "RealApp.Infrastructure.EmailService": {
+        "Send(System.String, System.String)": { "Lines": { "3": 2 }, "Branches": [] },
+        "SendBulk(System.Collections.Generic.List`1<System.String>)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    }
+  }
+}

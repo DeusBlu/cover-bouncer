@@ -287,6 +287,9 @@ Not in v1. Each profile is independent. This keeps the config simple and explici
 ### Can one file use multiple profiles?
 Not in v1. One file = one profile. Pick the strictest requirement for that file.
 
+### What about filtered test runs (`dotnet test --filter`)?
+CoverBouncer handles this automatically! When a filter is detected, files with 0% coverage are skipped (they were instrumented by Coverlet but not targeted by the filtered tests). No configuration changes needed. See [README - Filtered Test Runs](../README.md#-filtered-test-runs---filter) for details.
+
 ### What if Coverlet isn't installed?
 The MSBuild package will guide you to install it. Cover-Bouncer requires Coverlet for coverage collection.
 

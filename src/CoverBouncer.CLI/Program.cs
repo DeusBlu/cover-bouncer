@@ -38,6 +38,7 @@ class Program
         Console.WriteLine("  verify                    Verify coverage against policy");
         Console.WriteLine("    --coverage, -c <path>   Coverage report path (default: TestResults/coverage.json)");
         Console.WriteLine("    --config, -f <path>     Config file path (default: coverbouncer.json)");
+        Console.WriteLine("    --filtered              Treat as filtered test run (skip files with 0 coverage)");
         Console.WriteLine();
         Console.WriteLine("  tag                       Tag files with coverage profiles");
         Console.WriteLine("    --pattern <glob>        Tag files matching glob pattern (e.g., \"**/*Service.cs\")");
@@ -120,6 +121,7 @@ class Program
         {
             var coverage = "TestResults/coverage.json";
             var config = "coverbouncer.json";
+            var isFilteredRun = false;
 
             // Parse options
             for (int i = 0; i < args.Length; i++)
@@ -139,6 +141,10 @@ class Program
                         config = args[i + 1];
                         i++;
                     }
+                }
+                else if (args[i] == "--filtered")
+                {
+                    isFilteredRun = true;
                 }
             }
 
@@ -175,16 +181,28 @@ class Program
             
             // Validate
             var engine = new PolicyEngine();
-            var result = engine.Validate(policyConfig, coverageReport);
+            if (isFilteredRun)
+            {
+                Console.WriteLine("ℹ️  Filtered test run mode: files with zero coverage will be skipped");
+            }
+            var result = engine.Validate(policyConfig, coverageReport, isFilteredRun);
             
-            // Build profile summary
+            // Build profile summary (exclude skipped files from counts)
+            var skippedFilePaths = isFilteredRun
+                ? coverageReport.Files
+                    .Where(f => f.Value.CoveredLines == 0)
+                    .Select(f => f.Key)
+                    .ToHashSet()
+                : new HashSet<string>();
+            
             var profileSummary = new Dictionary<string, (int passed, int failed, decimal threshold)>();
             foreach (var (profileName, files) in taggedFiles)
             {
                 var threshold = policyConfig.Profiles.TryGetValue(profileName, out var t) ? t.MinLine : 0;
                 var violations = result.Violations.Where(v => v.ProfileName == profileName).Select(v => v.FilePath).ToHashSet();
-                var passed = files.Count(f => !violations.Contains(f.FilePath));
-                var failed = files.Count - passed;
+                var validatedFiles = files.Where(f => !skippedFilePaths.Contains(f.FilePath)).ToList();
+                var passed = validatedFiles.Count(f => !violations.Contains(f.FilePath));
+                var failed = validatedFiles.Count - passed;
                 profileSummary[profileName] = (passed, failed, threshold);
             }
 
@@ -193,7 +211,7 @@ class Program
             Console.WriteLine("Coverage Summary by Profile");
             Console.WriteLine("─────────────────────────────────────────");
             
-            foreach (var (profileName, (passed, failed, threshold)) in profileSummary.OrderBy(p => p.Key))
+            foreach (var (profileName, (passed, failed, threshold)) in profileSummary.Where(p => p.Value.passed + p.Value.failed > 0).OrderBy(p => p.Key))
             {
                 var status = failed == 0 ? "✅" : "❌";
                 var thresholdStr = threshold == 0 ? "exempt" : $"{threshold:P0} required";
@@ -213,6 +231,13 @@ class Program
             {
                 Console.WriteLine("  ✅ All files explicitly tagged");
             }
+            
+            // Report skipped files (filtered test runs)
+            if (result.SkippedFiles > 0)
+            {
+                Console.WriteLine($"  ⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run)");
+            }
+            
             Console.WriteLine("─────────────────────────────────────────");
             Console.WriteLine();
 

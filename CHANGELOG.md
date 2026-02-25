@@ -5,6 +5,63 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.8] - 2026-02-24
+
+### Fixed
+- **Filtered Test Runs No Longer Cause False Failures** 🎯
+  - **Problem:** Running `dotnet test --filter "Category=Unit"` (or any `--filter`) caused Coverlet to
+    report 0% coverage for files not targeted by the filtered tests, because Coverlet instruments the
+    entire assembly before the test runner applies filters. CoverBouncer then failed those files for
+    not meeting their coverage thresholds — even though no tests were supposed to run against them.
+  - **Solution:** CoverBouncer now automatically detects filtered test runs via the `$(VSTestTestCaseFilter)`
+    MSBuild property. When a filter is active, files with zero covered lines are **skipped** instead of
+    validated, eliminating false failures.
+  - **No configuration required** — detection is automatic when using `dotnet test --filter`.
+
+### Added
+- **Automatic Filtered Run Detection (MSBuild)**
+  - The `VerifyCoverageTask` now accepts a `TestCaseFilter` property, auto-populated from
+    `$(VSTestTestCaseFilter)` by the `.targets` files.
+  - When non-empty, files with `CoveredLines == 0` are skipped (assumed not targeted by the filter).
+  - Informational logging shows filter detection and skip counts.
+
+- **CLI `--filtered` Flag**
+  - `coverbouncer verify --filtered` enables filtered-run behavior for CLI usage.
+  - Use this when validating coverage reports generated from filtered test runs.
+
+- **`SkippedFiles` on `ValidationResult`**
+  - New property tracks how many files were skipped due to filtered-run detection.
+  - Included in `GetSummary()` output: `"✓ All 5 files meet coverage requirements, 12 skipped (filtered run)"`.
+
+- **Profile Summary Accuracy**
+  - Profile-level pass/fail counts now correctly exclude skipped files.
+  - Profiles with only skipped files are omitted from the summary to reduce noise.
+
+- **New Validation Test Scenarios**
+  - **Scenario 8: Filtered Run** — Demonstrates that untargeted files are skipped, no false failures.
+  - **Scenario 9: Full Run (Same Data)** — Same coverage data validated as a full run, shows 3 violations.
+  - **Side-by-side comparison test** confirms identical data produces different (correct) outcomes.
+  - 22 new tests (17 unit + 5 integration), bringing total to 105.
+
+### Documentation
+- Updated README with "Filtered Test Runs (--filter)" section
+- Updated MSBuild configuration docs with `TestCaseFilter` property reference
+- Added CI/CD best practices: full runs for gates, filtered runs for fast feedback
+- Updated Coverlet integration docs explaining the instrumentation behavior
+- Updated getting-started guide with filtered run guidance
+
+### ⚠️ Best Practice
+**Always use a FULL test run (no `--filter`) as your final CI gate.** Filtered runs are useful for
+fast local feedback, but only a full run validates coverage across your entire codebase. A typical
+CI setup:
+```yaml
+# Fast feedback (filtered) — coverage violations in targeted files only
+- dotnet test --filter "Category=Unit"
+
+# Final gate (full run) — validates ALL coverage thresholds
+- dotnet test
+```
+
 ## [1.0.0-preview.4] - 2025-12-14
 
 ### Fixed
@@ -211,5 +268,6 @@ See [ROADMAP.md](ROADMAP.md) for planned features including:
 
 ---
 
+[1.0.0-preview.8]: https://github.com/DeusBlu/cover-bouncer/releases/tag/v1.0.0-preview.8
 [1.0.0-preview.2]: https://github.com/DeusBlu/cover-bouncer/releases/tag/v1.0.0-preview.2
 [1.0.0-preview.1]: https://github.com/DeusBlu/cover-bouncer/releases/tag/v1.0.0-preview.1

@@ -119,6 +119,38 @@ CoverBouncer: Coverage violations detected (build not failed):
 
 ---
 
+### `TestCaseFilter` (Auto-Populated)
+**Type:** `string`  
+**Default:** `$(VSTestTestCaseFilter)` (set automatically by MSBuild)  
+**Required:** No — **you should never need to set this manually**
+
+The test case filter expression from `dotnet test --filter`. This property is **automatically populated** from the `$(VSTestTestCaseFilter)` MSBuild property, which is set whenever you use `--filter`.
+
+**What it does:**
+When non-empty, CoverBouncer treats the test run as **filtered** — files with zero covered lines are skipped instead of validated. This prevents false failures for files that weren't targeted by the filtered tests.
+
+**Why this exists:**
+Coverlet instruments the entire assembly before tests run. When you filter tests with `--filter`, untested files still appear in the Coverlet report with 0% coverage. Without filter awareness, CoverBouncer would fail those files. See [README - Filtered Test Runs](../README.md#-filtered-test-runs---filter) for the full explanation.
+
+**How it's set (you don't need to do anything):**
+```xml
+<!-- In CoverBouncer.MSBuild.targets (automatic): -->
+<VerifyCoverageTask
+  ...
+  TestCaseFilter="$(VSTestTestCaseFilter)" />
+```
+
+**Override (advanced):**
+In rare cases, you might want to force filtered-run behavior:
+```xml
+<PropertyGroup>
+  <!-- Force CoverBouncer to treat this as a filtered run -->
+  <VSTestTestCaseFilter>forced</VSTestTestCaseFilter>
+</PropertyGroup>
+```
+
+---
+
 ## Complete Example
 
 ```xml
@@ -234,6 +266,34 @@ MySolution/
   <CoverBouncerFailOnViolations Condition="'$(CI)' != 'true'">false</CoverBouncerFailOnViolations>
 </PropertyGroup>
 ```
+
+### Scenario 5: Filtered Test Runs in CI
+
+**Problem:** CI pipeline uses `dotnet test --filter` for fast feedback, but filtered runs cause false failures because Coverlet reports 0% for untargeted files.
+
+**Solution:** No configuration needed! CoverBouncer automatically detects filtered runs via `$(VSTestTestCaseFilter)`.
+
+```yaml
+# CI pipeline example
+jobs:
+  quick-check:
+    steps:
+      # Filtered run — CoverBouncer auto-detects and skips untargeted files
+      - run: dotnet test --filter "Category=Unit"
+      # Only files actually covered by unit tests are validated ✅
+
+  full-coverage-gate:
+    steps:
+      # Full run — ALL files validated against their thresholds
+      - run: dotnet test
+      # This is your real coverage gate ✅
+```
+
+**What happens:**
+- `dotnet test --filter "Category=Unit"` → MSBuild sets `$(VSTestTestCaseFilter)` → CoverBouncer skips files with 0 covered lines
+- `dotnet test` (no filter) → `$(VSTestTestCaseFilter)` is empty → CoverBouncer validates all files
+
+**⚠️ Best Practice:** Always include a **full run** (no `--filter`) as your final CI gate. Filtered runs are great for fast feedback but only a full run catches files that genuinely lack tests.
 
 ---
 

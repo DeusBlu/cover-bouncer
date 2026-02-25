@@ -35,6 +35,13 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
     /// </summary>
     public bool FailOnViolations { get; set; } = true;
 
+    /// <summary>
+    /// The test case filter expression from dotnet test --filter.
+    /// When non-empty, files with zero covered lines are skipped
+    /// (they were instrumented but not targeted by the filtered tests).
+    /// </summary>
+    public string TestCaseFilter { get; set; } = "";
+
     public override bool Execute()
     {
         try
@@ -94,16 +101,32 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
 
             // Validate coverage
             var engine = new PolicyEngine();
-            var result = engine.Validate(config, coverageReport);
+            var isFilteredRun = !string.IsNullOrWhiteSpace(TestCaseFilter);
+            if (isFilteredRun)
+            {
+                Log.LogMessage(MessageImportance.Normal, 
+                    $"CoverBouncer: Filtered test run detected (filter: {TestCaseFilter})");
+                Log.LogMessage(MessageImportance.Normal, 
+                    "CoverBouncer: Files with zero coverage will be skipped (not targeted by filtered tests)");
+            }
+            var result = engine.Validate(config, coverageReport, isFilteredRun);
 
-            // Build profile summary
+            // Build profile summary (exclude skipped files from counts)
+            var skippedFilePaths = isFilteredRun
+                ? coverageReport.Files
+                    .Where(f => f.Value.CoveredLines == 0)
+                    .Select(f => f.Key)
+                    .ToHashSet()
+                : new HashSet<string>();
+            
             var profileSummary = new Dictionary<string, (int passed, int failed, decimal threshold)>();
             foreach (var (profileName, files) in taggedFiles)
             {
                 var threshold = config.Profiles.TryGetValue(profileName, out var t) ? t.MinLine : 0;
                 var violations = result.Violations.Where(v => v.ProfileName == profileName).Select(v => v.FilePath).ToHashSet();
-                var passed = files.Count(f => !violations.Contains(f.FilePath));
-                var failed = files.Count - passed;
+                var validatedFiles = files.Where(f => !skippedFilePaths.Contains(f.FilePath)).ToList();
+                var passed = validatedFiles.Count(f => !violations.Contains(f.FilePath));
+                var failed = validatedFiles.Count - passed;
                 profileSummary[profileName] = (passed, failed, threshold);
             }
 
@@ -112,7 +135,7 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             Log.LogMessage(MessageImportance.High, "CoverBouncer: Coverage Summary by Profile");
             Log.LogMessage(MessageImportance.High, "─────────────────────────────────────────");
             
-            foreach (var (profile, (passed, failed, threshold)) in profileSummary.OrderBy(p => p.Key))
+            foreach (var (profile, (passed, failed, threshold)) in profileSummary.Where(p => p.Value.passed + p.Value.failed > 0).OrderBy(p => p.Key))
             {
                 var status = failed == 0 ? "✅" : "❌";
                 var thresholdStr = threshold == 0 ? "exempt" : $"{threshold:P0} required";
@@ -135,6 +158,13 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             else
             {
                 Log.LogMessage(MessageImportance.High, "  ✅ All files explicitly tagged");
+            }
+            
+            // Report skipped files (filtered test runs)
+            if (result.SkippedFiles > 0)
+            {
+                Log.LogMessage(MessageImportance.High, 
+                    $"  ⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run)");
             }
             
             Log.LogMessage(MessageImportance.High, "─────────────────────────────────────────");

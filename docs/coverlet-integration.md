@@ -50,6 +50,32 @@ Test frameworks and mocking libraries that don't need coverage:
 <Exclude>$(Exclude);[xunit.*]*;[FluentAssertions]*;[Moq]*;[NSubstitute]*</Exclude>
 ```
 
+## Understanding Coverlet's Assembly-Level Instrumentation
+
+This is important context for understanding CoverBouncer's behavior with filtered test runs.
+
+### How Coverlet Works
+
+Coverlet instruments assemblies **before** tests run. It rewrites IL code to insert hit counters on every line and branch. This happens at the **assembly level** — every file in the assembly gets instrumented, regardless of which tests will actually run.
+
+### The Filtered Run Problem
+
+When you run `dotnet test --filter "Category=Unit"`, the sequence is:
+
+1. **Coverlet instruments** the entire assembly (all files get hit counters)
+2. **Test runner applies** the `--filter` (only matching tests execute)
+3. **Coverlet reports** results for ALL instrumented files
+
+Files not targeted by the filtered tests appear with **0 hits on every line** — they look like they have 0% coverage. But this is misleading: no tests were supposed to run against them.
+
+### How CoverBouncer Handles This
+
+CoverBouncer automatically detects filtered runs via `$(VSTestTestCaseFilter)` and **skips** files with zero covered lines. This eliminates false failures.
+
+**No Coverlet configuration can solve this** — Coverlet has no concept of "which files a test targets." The solution must be in the validation layer, which is exactly where CoverBouncer handles it.
+
+See [README - Filtered Test Runs](../README.md#-filtered-test-runs---filter) for usage details and examples.
+
 ## Best Practices
 
 ### 1. Use Directory.Build.props for Test Projects

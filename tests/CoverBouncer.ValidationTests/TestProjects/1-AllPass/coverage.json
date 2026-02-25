@@ -1,0 +1,96 @@
+{
+  "TestApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\1-AllPass\\src\\PaymentService.cs": {
+      "TestApp.PaymentService": {
+        "ProcessPayment(System.Decimal)": {
+          "Lines": {
+            "9": 2,
+            "10": 1,
+            "12": 2
+          },
+          "Branches": [
+            { "Line": 9, "Offset": 0, "EndOffset": 2, "Path": 0, "Ordinal": 0, "Hits": 1 },
+            { "Line": 9, "Offset": 0, "EndOffset": 2, "Path": 1, "Ordinal": 1, "Hits": 1 }
+          ]
+        },
+        "ValidatePayment(System.Decimal)": {
+          "Lines": {
+            "16": 2
+          },
+          "Branches": [
+            { "Line": 16, "Offset": 0, "EndOffset": 2, "Path": 0, "Ordinal": 0, "Hits": 1 },
+            { "Line": 16, "Offset": 0, "EndOffset": 2, "Path": 1, "Ordinal": 1, "Hits": 1 }
+          ]
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\1-AllPass\\src\\OrderProcessor.cs": {
+      "TestApp.OrderProcessor": {
+        "ProcessOrder(System.Int32)": {
+          "Lines": {
+            "9": 2,
+            "10": 1,
+            "12": 1
+          },
+          "Branches": []
+        },
+        "CalculateTotal(System.Decimal, System.Decimal)": {
+          "Lines": {
+            "16": 1
+          },
+          "Branches": []
+        },
+        "LogOrder(System.Int32)": {
+          "Lines": {
+            "21": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\1-AllPass\\src\\CustomerDto.cs": {
+      "TestApp.CustomerDto": {
+        "get_Id()": {
+          "Lines": {
+            "7": 0
+          },
+          "Branches": []
+        },
+        "set_Id(System.Int32)": {
+          "Lines": {
+            "7": 0
+          },
+          "Branches": []
+        },
+        "GetDisplayName()": {
+          "Lines": {
+            "12": 0
+          },
+          "Branches": []
+        }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\1-AllPass\\src\\Utilities.cs": {
+      "TestApp.Utilities": {
+        "FormatCurrency(System.Decimal)": {
+          "Lines": {
+            "9": 2
+          },
+          "Branches": []
+        },
+        "IsValidEmail(System.String)": {
+          "Lines": {
+            "13": 2
+          },
+          "Branches": []
+        },
+        "LogMessage(System.String)": {
+          "Lines": {
+            "18": 0
+          },
+          "Branches": []
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "TestApp.dll": {
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Critical1.cs": {
+      "TestApp.Critical.CriticalService1": {
+        "Method1()": { "Lines": { "3": 2 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Critical2.cs": {
+      "TestApp.Critical.CriticalService2": {
+        "Method1()": { "Lines": { "3": 2 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Critical3.cs": {
+      "TestApp.Critical.CriticalService3": {
+        "Method1()": { "Lines": { "3": 2 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Logic1.cs": {
+      "TestApp.Logic.BusinessService1": {
+        "Method1()": { "Lines": { "3": 2 }, "Branches": [] },
+        "Method2()": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Logic2.cs": {
+      "TestApp.Logic.BusinessService2": {
+        "Method1()": { "Lines": { "3": 2 }, "Branches": [] },
+        "Method2()": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Dto1.cs": {
+      "TestApp.Models.Dto1": {
+        "get_Id()": { "Lines": { "3": 0 }, "Branches": [] },
+        "set_Id(System.Int32)": { "Lines": { "3": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Standard1.cs": {
+      "TestApp.Utils.StandardUtil1": {
+        "Add(System.Int32, System.Int32)": { "Lines": { "2": 2 }, "Branches": [] },
+        "Log()": { "Lines": { "2": 0 }, "Branches": [] }
+      }
+    },
+    "d:\\Projects\\cover-bouncer\\tests\\CoverBouncer.ValidationTests\\TestProjects\\5-MultipleProfiles\\src\\Standard2.cs": {
+      "TestApp.Utils.StandardUtil2": {
+        "Multiply(System.Int32, System.Int32)": { "Lines": { "2": 2 }, "Branches": [] },
+        "Debug()": { "Lines": { "2": 0 }, "Branches": [] }
+      }
+    }
+  }
+}
