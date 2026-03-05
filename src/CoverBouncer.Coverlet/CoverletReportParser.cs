@@ -44,7 +44,7 @@ public sealed class CoverletReportParser
             AllowTrailingCommas = true
         });
 
-        var fileData = new Dictionary<string, (int total, int covered)>();
+        var fileData = new Dictionary<string, (int total, int covered, List<int> uncoveredLines)>();
 
         // Coverlet format: { "Module.dll": { "FilePath": { "ClassName": { "Method": { "Lines": {...} } } } } }
         foreach (var moduleProperty in doc.RootElement.EnumerateObject())
@@ -68,10 +68,10 @@ public sealed class CoverletReportParser
                         // Aggregate line coverage at file level
                         if (!fileData.ContainsKey(filePath))
                         {
-                            fileData[filePath] = (0, 0);
+                            fileData[filePath] = (0, 0, new List<int>());
                         }
 
-                        var (totalLines, coveredLines) = fileData[filePath];
+                        var (totalLines, coveredLines, uncoveredLines) = fileData[filePath];
 
                         foreach (var line in lines.EnumerateObject())
                         {
@@ -81,9 +81,13 @@ public sealed class CoverletReportParser
                             {
                                 coveredLines++;
                             }
+                            else if (int.TryParse(line.Name, out var lineNumber))
+                            {
+                                uncoveredLines.Add(lineNumber);
+                            }
                         }
 
-                        fileData[filePath] = (totalLines, coveredLines);
+                        fileData[filePath] = (totalLines, coveredLines, uncoveredLines);
                     }
                 }
             }
@@ -91,7 +95,7 @@ public sealed class CoverletReportParser
 
         // Convert to FileCoverage objects
         var files = new Dictionary<string, FileCoverage>();
-        foreach (var (filePath, (totalLines, coveredLines)) in fileData)
+        foreach (var (filePath, (totalLines, coveredLines, uncoveredLines)) in fileData)
         {
             var lineRate = totalLines > 0 ? (decimal)coveredLines / totalLines : 0m;
 
@@ -100,7 +104,8 @@ public sealed class CoverletReportParser
                 FilePath = filePath,
                 LineRate = lineRate,
                 TotalLines = totalLines,
-                CoveredLines = coveredLines
+                CoveredLines = coveredLines,
+                UncoveredLines = uncoveredLines.OrderBy(n => n).Distinct().ToList()
             };
         }
 

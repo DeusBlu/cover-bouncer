@@ -177,24 +177,48 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             }
             else
             {
-                Log.LogError($"❌ CoverBouncer: {result.Violations.Count} coverage violation(s) found");
-                Log.LogError("");
+                // Build a single consolidated error message
+                // Each Log.LogError() gets the full [project.csproj] path appended by MSBuild,
+                // so we consolidate into ONE error call to keep output clean.
+                var violationLines = new List<string>();
                 
-                // Group violations by profile
                 var byProfile = result.Violations.GroupBy(v => v.ProfileName).OrderBy(g => g.Key);
-                
                 foreach (var group in byProfile)
                 {
                     var threshold = config.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
-                    Log.LogError($"  Profile: {group.Key} (requires {threshold:P0} line coverage)");
+                    foreach (var violation in group.OrderBy(v => v.FilePath))
+                    {
+                        var fileName = Path.GetFileName(violation.FilePath);
+                        violationLines.Add($"{fileName}: {violation.ActualCoverage:P1} (need {threshold:P0}, profile: {group.Key})");
+                    }
+                }
+
+                var summary = string.Join(" | ", violationLines);
+                Log.LogError($"CoverBouncer: {result.Violations.Count} violation(s) — {summary}");
+
+                // Detailed breakdown goes to normal messages (no project path suffix)
+                Log.LogMessage(MessageImportance.High, "");
+                Log.LogMessage(MessageImportance.High, $"❌ CoverBouncer: {result.Violations.Count} coverage violation(s) found");
+                Log.LogMessage(MessageImportance.High, "");
+
+                foreach (var group in byProfile)
+                {
+                    var threshold = config.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
+                    Log.LogMessage(MessageImportance.High, $"  Profile: {group.Key} (requires {threshold:P0} line coverage)");
                     
                     foreach (var violation in group.OrderBy(v => v.FilePath))
                     {
                         var fileName = Path.GetFileName(violation.FilePath);
                         var gap = violation.RequiredCoverage - violation.ActualCoverage;
-                        Log.LogError($"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
+                        Log.LogMessage(MessageImportance.High, $"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
+                        
+                        if (violation.UncoveredLines.Count > 0)
+                        {
+                            var ranges = CoverageViolation.FormatLineRanges(violation.UncoveredLines);
+                            Log.LogMessage(MessageImportance.High, $"       Uncovered lines: {ranges}");
+                        }
                     }
-                    Log.LogError("");
+                    Log.LogMessage(MessageImportance.High, "");
                 }
 
                 // Actionable suggestions

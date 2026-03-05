@@ -439,4 +439,70 @@ public class PolicyEngineTests
         Assert.Equal(2, result.FilesFailed);
         Assert.Equal(3, result.FilesPassed); // 5 checked - 2 failed = 3 passed
     }
+
+    // ──────────────────────────────────────────────
+    // FormatLineRanges
+    // ──────────────────────────────────────────────
+
+    [Fact]
+    public void FormatLineRanges_ConsecutiveLines_CollapsesToRange()
+    {
+        var result = CoverageViolation.FormatLineRanges(new List<int> { 10, 11, 12, 13 });
+        Assert.Equal("10-13", result);
+    }
+
+    [Fact]
+    public void FormatLineRanges_MixedRangesAndSingles()
+    {
+        var result = CoverageViolation.FormatLineRanges(new List<int> { 1, 2, 3, 7, 9, 10, 11 });
+        Assert.Equal("1-3, 7, 9-11", result);
+    }
+
+    [Fact]
+    public void FormatLineRanges_SingleLine()
+    {
+        var result = CoverageViolation.FormatLineRanges(new List<int> { 42 });
+        Assert.Equal("42", result);
+    }
+
+    [Fact]
+    public void FormatLineRanges_EmptyList_ReturnsEmpty()
+    {
+        var result = CoverageViolation.FormatLineRanges(new List<int>());
+        Assert.Equal("", result);
+    }
+
+    [Fact]
+    public void FormatLineRanges_Null_ReturnsEmpty()
+    {
+        var result = CoverageViolation.FormatLineRanges(null!);
+        Assert.Equal("", result);
+    }
+
+    [Fact]
+    public void FormatLineRanges_UnsortedInput_SortsAutomatically()
+    {
+        var result = CoverageViolation.FormatLineRanges(new List<int> { 20, 5, 6, 7, 15 });
+        Assert.Equal("5-7, 15, 20", result);
+    }
+
+    [Fact]
+    public void Violation_UncoveredLines_PassedFromEngine()
+    {
+        var config = CreateConfig(defaultProfile: "Standard");
+        var report = CreateReport(new FileCoverage
+        {
+            FilePath = "/src/MyService.cs",
+            LineRate = 0.5m,
+            TotalLines = 4,
+            CoveredLines = 2,
+            UncoveredLines = new List<int> { 12, 13 },
+            AssignedProfile = "Standard"
+        });
+
+        var result = _engine.Validate(config, report);
+
+        Assert.Single(result.Violations);
+        Assert.Equal(new List<int> { 12, 13 }, result.Violations[0].UncoveredLines);
+    }
 }

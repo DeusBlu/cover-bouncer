@@ -5,6 +5,29 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.9] - 2026-03-04
+
+### Added
+- **Uncovered Line Numbers in Violation Output** 🎯
+  - Violations now show exactly which lines are not covered, with consecutive lines collapsed into ranges.
+  - Example: `Uncovered lines: 12-15, 28, 31-33`
+  - Works in both MSBuild and CLI output.
+  - Helps developers pinpoint exactly which lines need tests instead of guessing.
+  - New `UncoveredLines` property on `FileCoverage` and `CoverageViolation` models.
+  - New `FormatLineRanges()` utility on `CoverageViolation` for compact range formatting.
+
+### Fixed
+- **Cleaner MSBuild Error Output**
+  - MSBuild appends `[full\path\to\project.csproj]` to every `Log.LogError()` call, making multi-line
+    error output unreadable. Now uses a single consolidated `LogError` with a pipe-separated summary,
+    and moves the detailed per-file breakdown to `LogMessage(High)` which renders cleanly.
+- **`FilesPassed` Property Was Always Zero**
+  - `ValidationResult.FilesPassed` was declared as `{ get; init; }` but never set by `PolicyEngine`.
+  - Changed to a computed property: `=> TotalFilesChecked - FilesFailed`.
+
+### Tests
+- 8 new tests (6 FormatLineRanges + 1 engine passthrough + 1 FilesPassed computation), bringing total to 113.
+
 ## [1.0.0-preview.8] - 2026-02-24
 
 ### Fixed

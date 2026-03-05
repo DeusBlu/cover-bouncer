@@ -27,6 +27,11 @@ public sealed class FileCoverage
     public int CoveredLines { get; set; }
 
     /// <summary>
+    /// Line numbers that were not covered (hit count = 0).
+    /// </summary>
+    public List<int> UncoveredLines { get; set; } = new();
+
+    /// <summary>
     /// Coverage profile assigned to this file (from tag or default).
     /// </summary>
     public string? AssignedProfile { get; set; }

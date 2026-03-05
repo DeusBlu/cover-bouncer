@@ -265,6 +265,12 @@ class Program
                         var fileName = Path.GetFileName(violation.FilePath);
                         var gap = violation.RequiredCoverage - violation.ActualCoverage;
                         Console.WriteLine($"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
+                        
+                        if (violation.UncoveredLines.Count > 0)
+                        {
+                            var ranges = CoverageViolation.FormatLineRanges(violation.UncoveredLines);
+                            Console.WriteLine($"       Uncovered lines: {ranges}");
+                        }
                     }
                     Console.WriteLine();
                 }

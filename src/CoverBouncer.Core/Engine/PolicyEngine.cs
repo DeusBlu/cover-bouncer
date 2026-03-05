@@ -55,7 +55,8 @@ public sealed class PolicyEngine
                     ProfileName = profileName,
                     ViolationType = ViolationType.LineCoverageTooLow,
                     RequiredCoverage = thresholds.MinLine,
-                    ActualCoverage = coverage.LineRate
+                    ActualCoverage = coverage.LineRate,
+                    UncoveredLines = coverage.UncoveredLines
                 });
             }
         }
