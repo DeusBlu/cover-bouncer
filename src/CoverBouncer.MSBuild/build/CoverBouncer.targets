@@ -34,6 +34,7 @@
              AssemblyFile="$(CoverBouncerTaskAssembly)" />
 
   <!-- Target: Ensure config exists before running tests -->
+  <!-- Check project dir, solution root (Directory.Build.props location), and one level up -->
   <Target Name="CoverBouncerEnsureConfig" 
           BeforeTargets="VSTest" 
           Condition="'$(EnableCoverBouncer)' == 'true'">
@@ -41,8 +42,11 @@
     <Message Importance="normal" 
              Text="CoverBouncer: Checking for configuration file..." />
     
-    <Warning Condition="!Exists('$(MSBuildProjectDirectory)/$(CoverBouncerConfigFile)')"
-             Text="CoverBouncer: Configuration file '$(CoverBouncerConfigFile)' not found. Run 'dotnet tool run coverbouncer init' to create one, or coverage verification will be skipped." />
+    <Warning Condition="!Exists('$(MSBuildProjectDirectory)/$(CoverBouncerConfigFile)') AND
+                        !Exists('$(MSBuildProjectDirectory)/../$(CoverBouncerConfigFile)') AND
+                        !Exists('$(MSBuildProjectDirectory)/../../$(CoverBouncerConfigFile)') AND
+                        !Exists('$(SolutionDir)$(CoverBouncerConfigFile)')"
+             Text="CoverBouncer: Configuration file '$(CoverBouncerConfigFile)' not found in project or parent directories. Run 'dotnet tool run coverbouncer init' to create one, or coverage verification will be skipped." />
   </Target>
 
   <!-- Target: Verify coverage after tests run -->

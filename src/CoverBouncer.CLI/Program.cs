@@ -1,4 +1,5 @@
 ﻿using CoverBouncer.Coverlet;
+using CoverBouncer.Core;
 using CoverBouncer.Core.Configuration;
 using CoverBouncer.Core.Engine;
 using CoverBouncer.Core.Models;
@@ -208,48 +209,48 @@ class Program
 
             // Output summary
             Console.WriteLine();
-            Console.WriteLine("Coverage Summary by Profile");
-            Console.WriteLine("─────────────────────────────────────────");
+            Console.WriteLine($"{Ansi.Heading}Coverage Summary by Profile{Ansi.Reset}");
+            Console.WriteLine($"{Ansi.Muted}─────────────────────────────────────────{Ansi.Reset}");
             
             foreach (var (profileName, (passed, failed, threshold)) in profileSummary.Where(p => p.Value.passed + p.Value.failed > 0).OrderBy(p => p.Key))
             {
-                var status = failed == 0 ? "✅" : "❌";
+                var status = failed == 0 ? $"{Ansi.Pass}✅" : $"{Ansi.Fail}❌";
                 var thresholdStr = threshold == 0 ? "exempt" : $"{threshold:P0} required";
                 var isDefault = profileName == policyConfig.DefaultProfile;
-                var defaultMarker = isDefault ? " (default)" : "";
+                var defaultMarker = isDefault ? $" {Ansi.Muted}(default){Ansi.Reset}" : "";
                 
-                Console.WriteLine($"  {status} {profileName}{defaultMarker}: {passed} passed, {failed} failed ({thresholdStr})");
+                Console.WriteLine($"  {status} {Ansi.Info}{profileName}{Ansi.Reset}{defaultMarker}: {passed} passed, {failed} failed {Ansi.Muted}({thresholdStr}){Ansi.Reset}");
             }
             
             Console.WriteLine();
             if (untaggedFiles.Count > 0)
             {
-                Console.WriteLine($"  ℹ️  {untaggedFiles.Count} file(s) untagged → using '{policyConfig.DefaultProfile}' profile");
-                Console.WriteLine($"     Tip: Tag files with // [CoverageProfile(\"ProfileName\")] for explicit control");
+                Console.WriteLine($"  {Ansi.Warn}ℹ️  {untaggedFiles.Count} file(s) untagged → using '{policyConfig.DefaultProfile}' profile{Ansi.Reset}");
+                Console.WriteLine($"     {Ansi.Muted}Tip: Tag files with // [CoverageProfile(\"ProfileName\")] for explicit control{Ansi.Reset}");
             }
             else
             {
-                Console.WriteLine("  ✅ All files explicitly tagged");
+                Console.WriteLine($"  {Ansi.Pass}✅ All files explicitly tagged{Ansi.Reset}");
             }
             
             // Report skipped files (filtered test runs)
             if (result.SkippedFiles > 0)
             {
-                Console.WriteLine($"  ⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run)");
+                Console.WriteLine($"  {Ansi.Warn}⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run){Ansi.Reset}");
             }
             
-            Console.WriteLine("─────────────────────────────────────────");
+            Console.WriteLine($"{Ansi.Muted}─────────────────────────────────────────{Ansi.Reset}");
             Console.WriteLine();
 
             // Output results
             if (result.Success)
             {
-                Console.WriteLine($"✅ All {result.TotalFilesChecked} files passed coverage requirements");
+                Console.WriteLine($"{Ansi.Pass}{Ansi.Bold}✅ All {result.TotalFilesChecked} files passed coverage requirements{Ansi.Reset}");
                 return 0;
             }
             else
             {
-                Console.WriteLine($"❌ {result.Violations.Count} coverage violation(s) found");
+                Console.WriteLine($"{Ansi.Fail}{Ansi.Bold}❌ {result.Violations.Count} coverage violation(s) found{Ansi.Reset}");
                 Console.WriteLine();
                 
                 // Group violations by profile
@@ -258,28 +259,27 @@ class Program
                 foreach (var group in byProfile.OrderBy(g => g.Key))
                 {
                     var threshold = policyConfig.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
-                    Console.WriteLine($"  Profile: {group.Key} (requires {threshold:P0} line coverage)");
+                    Console.WriteLine($"  {Ansi.Info}Profile: {group.Key}{Ansi.Reset} {Ansi.Muted}(requires {threshold:P0} line coverage){Ansi.Reset}");
                     
                     foreach (var violation in group.OrderBy(v => v.FilePath))
                     {
                         var fileName = Path.GetFileName(violation.FilePath);
-                        var gap = violation.RequiredCoverage - violation.ActualCoverage;
-                        Console.WriteLine($"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
+                        Console.WriteLine($"    {Ansi.Fail}❌ {Ansi.File}{fileName}{Ansi.Reset}: {Ansi.Fail}{violation.ActualCoverage:P1}{Ansi.Reset}{Ansi.Muted}/{Ansi.Reset}{Ansi.Threshold}{violation.RequiredCoverage:P0}{Ansi.Reset}");
                         
                         if (violation.UncoveredLines.Count > 0)
                         {
                             var ranges = CoverageViolation.FormatLineRanges(violation.UncoveredLines);
-                            Console.WriteLine($"       Uncovered lines: {ranges}");
+                            Console.WriteLine($"       {Ansi.Muted}Uncovered lines: {ranges}{Ansi.Reset}");
                         }
                     }
                     Console.WriteLine();
                 }
 
                 // Actionable suggestions
-                Console.WriteLine("💡 How to fix:");
-                Console.WriteLine("   • Add tests to increase coverage for failing files");
-                Console.WriteLine("   • Or lower the threshold by tagging with a less strict profile:");
-                Console.WriteLine("     // [CoverageProfile(\"Standard\")]  // or \"Dto\" for 0% requirement");
+                Console.WriteLine($"{Ansi.Warn}💡 How to fix:{Ansi.Reset}");
+                Console.WriteLine($"   {Ansi.Muted}• Add tests to increase coverage for failing files{Ansi.Reset}");
+                Console.WriteLine($"   {Ansi.Muted}• Or lower the threshold by tagging with a less strict profile:{Ansi.Reset}");
+                Console.WriteLine($"     {Ansi.Muted}// [CoverageProfile(\"Standard\")]  // or \"Dto\" for 0% requirement{Ansi.Reset}");
                 Console.WriteLine();
                 
                 return 1;

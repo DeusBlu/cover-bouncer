@@ -16,6 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy</PackageTags>
     <Description>Profile-based code coverage enforcement for .NET projects</Description>
+    <PackageIcon>logo.png</PackageIcon>
     
     <!-- Source link -->
     <PublishRepositoryUrl>true</PublishRepositoryUrl>

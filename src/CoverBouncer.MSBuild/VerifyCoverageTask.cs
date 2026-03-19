@@ -1,5 +1,6 @@
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using CoverBouncer.Core;
 using CoverBouncer.Core.Configuration;
 using CoverBouncer.Core.Engine;
 using CoverBouncer.Core.Models;
@@ -132,18 +133,18 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
 
             // Report results
             Log.LogMessage(MessageImportance.High, "");
-            Log.LogMessage(MessageImportance.High, "CoverBouncer: Coverage Summary by Profile");
-            Log.LogMessage(MessageImportance.High, "─────────────────────────────────────────");
+            Log.LogMessage(MessageImportance.High, $"{Ansi.Heading}CoverBouncer: Coverage Summary by Profile{Ansi.Reset}");
+            Log.LogMessage(MessageImportance.High, $"{Ansi.Muted}─────────────────────────────────────────{Ansi.Reset}");
             
             foreach (var (profile, (passed, failed, threshold)) in profileSummary.Where(p => p.Value.passed + p.Value.failed > 0).OrderBy(p => p.Key))
             {
-                var status = failed == 0 ? "✅" : "❌";
+                var status = failed == 0 ? $"{Ansi.Pass}✅" : $"{Ansi.Fail}❌";
                 var thresholdStr = threshold == 0 ? "exempt" : $"{threshold:P0} required";
                 var isDefault = profile == config.DefaultProfile;
-                var defaultMarker = isDefault ? " (default)" : "";
+                var defaultMarker = isDefault ? $" {Ansi.Muted}(default){Ansi.Reset}" : "";
                 
                 Log.LogMessage(MessageImportance.High, 
-                    $"  {status} {profile}{defaultMarker}: {passed} passed, {failed} failed ({thresholdStr})");
+                    $"  {status} {Ansi.Info}{profile}{Ansi.Reset}{defaultMarker}: {passed} passed, {failed} failed {Ansi.Muted}({thresholdStr}){Ansi.Reset}");
             }
             
             // Report untagged files
@@ -151,82 +152,73 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             if (untaggedFiles.Count > 0)
             {
                 Log.LogMessage(MessageImportance.High, 
-                    $"  ℹ️  {untaggedFiles.Count} file(s) untagged → using '{config.DefaultProfile}' profile");
+                    $"  {Ansi.Warn}ℹ️  {untaggedFiles.Count} file(s) untagged → using '{config.DefaultProfile}' profile{Ansi.Reset}");
                 Log.LogMessage(MessageImportance.Normal, 
-                    $"     Tip: Tag files with // [CoverageProfile(\"ProfileName\")] for explicit control");
+                    $"     {Ansi.Muted}Tip: Tag files with // [CoverageProfile(\"ProfileName\")] for explicit control{Ansi.Reset}");
             }
             else
             {
-                Log.LogMessage(MessageImportance.High, "  ✅ All files explicitly tagged");
+                Log.LogMessage(MessageImportance.High, $"  {Ansi.Pass}✅ All files explicitly tagged{Ansi.Reset}");
             }
             
             // Report skipped files (filtered test runs)
             if (result.SkippedFiles > 0)
             {
                 Log.LogMessage(MessageImportance.High, 
-                    $"  ⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run)");
+                    $"  {Ansi.Warn}⏭️  {result.SkippedFiles} file(s) skipped (no coverage data in filtered test run){Ansi.Reset}");
             }
             
-            Log.LogMessage(MessageImportance.High, "─────────────────────────────────────────");
+            Log.LogMessage(MessageImportance.High, $"{Ansi.Muted}─────────────────────────────────────────{Ansi.Reset}");
 
             if (result.Success)
             {
                 Log.LogMessage(MessageImportance.High, 
-                    $"✅ CoverBouncer: All {result.TotalFilesChecked} files passed coverage requirements");
+                    $"{Ansi.Pass}{Ansi.Bold}✅ CoverBouncer: All {result.TotalFilesChecked} files passed coverage requirements{Ansi.Reset}");
                 return true;
             }
             else
             {
-                // Build a single consolidated error message
-                // Each Log.LogError() gets the full [project.csproj] path appended by MSBuild,
-                // so we consolidate into ONE error call to keep output clean.
-                var violationLines = new List<string>();
-                
+                // Detailed breakdown via LogMessage (no project path suffix from MSBuild)
+                Log.LogMessage(MessageImportance.High, "");
+                Log.LogMessage(MessageImportance.High, $"{Ansi.Fail}{Ansi.Bold}❌ CoverBouncer: {result.Violations.Count} coverage violation(s) found{Ansi.Reset}");
+                Log.LogMessage(MessageImportance.High, "");
+
                 var byProfile = result.Violations.GroupBy(v => v.ProfileName).OrderBy(g => g.Key);
                 foreach (var group in byProfile)
                 {
                     var threshold = config.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
-                    foreach (var violation in group.OrderBy(v => v.FilePath))
-                    {
-                        var fileName = Path.GetFileName(violation.FilePath);
-                        violationLines.Add($"{fileName}: {violation.ActualCoverage:P1} (need {threshold:P0}, profile: {group.Key})");
-                    }
-                }
-
-                var summary = string.Join(" | ", violationLines);
-                Log.LogError($"CoverBouncer: {result.Violations.Count} violation(s) — {summary}");
-
-                // Detailed breakdown goes to normal messages (no project path suffix)
-                Log.LogMessage(MessageImportance.High, "");
-                Log.LogMessage(MessageImportance.High, $"❌ CoverBouncer: {result.Violations.Count} coverage violation(s) found");
-                Log.LogMessage(MessageImportance.High, "");
-
-                foreach (var group in byProfile)
-                {
-                    var threshold = config.Profiles.TryGetValue(group.Key, out var t) ? t.MinLine : 0;
-                    Log.LogMessage(MessageImportance.High, $"  Profile: {group.Key} (requires {threshold:P0} line coverage)");
+                    Log.LogMessage(MessageImportance.High, $"  {Ansi.Info}Profile: {group.Key}{Ansi.Reset} {Ansi.Muted}(requires {threshold:P0} line coverage){Ansi.Reset}");
                     
                     foreach (var violation in group.OrderBy(v => v.FilePath))
                     {
-                        var fileName = Path.GetFileName(violation.FilePath);
-                        var gap = violation.RequiredCoverage - violation.ActualCoverage;
-                        Log.LogMessage(MessageImportance.High, $"    ❌ {fileName}: {violation.ActualCoverage:P1} coverage (need {gap:P1} more)");
+                        var fileName = GetRelativePath(violation.FilePath);
+                        Log.LogMessage(MessageImportance.High, $"    {Ansi.Fail}❌ {Ansi.File}{fileName}{Ansi.Reset}: {Ansi.Fail}{violation.ActualCoverage:P1}{Ansi.Reset}{Ansi.Muted}/{Ansi.Reset}{Ansi.Threshold}{violation.RequiredCoverage:P0}{Ansi.Reset}");
                         
                         if (violation.UncoveredLines.Count > 0)
                         {
                             var ranges = CoverageViolation.FormatLineRanges(violation.UncoveredLines);
-                            Log.LogMessage(MessageImportance.High, $"       Uncovered lines: {ranges}");
+                            Log.LogMessage(MessageImportance.High, $"       {Ansi.Muted}Uncovered lines: {ranges}{Ansi.Reset}");
                         }
                     }
                     Log.LogMessage(MessageImportance.High, "");
                 }
 
                 // Actionable suggestions
-                Log.LogMessage(MessageImportance.High, "💡 How to fix:");
-                Log.LogMessage(MessageImportance.High, "   • Add tests to increase coverage for failing files");
-                Log.LogMessage(MessageImportance.High, "   • Or lower the threshold by tagging with a less strict profile:");
-                Log.LogMessage(MessageImportance.High, "     // [CoverageProfile(\"Standard\")]  // or \"Dto\" for 0% requirement");
+                Log.LogMessage(MessageImportance.High, $"{Ansi.Warn}💡 How to fix:{Ansi.Reset}");
+                Log.LogMessage(MessageImportance.High, $"   {Ansi.Muted}• Add tests to increase coverage for failing files{Ansi.Reset}");
+                Log.LogMessage(MessageImportance.High, $"   {Ansi.Muted}• Or lower the threshold by tagging with a less strict profile:{Ansi.Reset}");
+                Log.LogMessage(MessageImportance.High, $"     {Ansi.Muted}// [CoverageProfile(\"Standard\")]  // or \"Dto\" for 0% requirement{Ansi.Reset}");
                 Log.LogMessage(MessageImportance.High, "");
+
+                // Clean error summary — just "Errors:" header with compact file lines
+                // MSBuild appends [project.csproj] to LogError, so keep it minimal
+                var errorLines = new List<string> { "Errors:" };
+                foreach (var violation in result.Violations.OrderBy(v => v.FilePath))
+                {
+                    var fileName = GetRelativePath(violation.FilePath);
+                    errorLines.Add($"  {fileName}: {violation.ActualCoverage:P1}/{violation.RequiredCoverage:P0}");
+                }
+                Log.LogError(string.Join(Environment.NewLine, errorLines));
 
                 return !FailOnViolations; // Fail build if FailOnViolations is true
             }
@@ -240,5 +232,36 @@ public sealed class VerifyCoverageTask : Microsoft.Build.Utilities.Task
             }
             return false;
         }
+    }
+
+    /// <summary>
+    /// Gets a relative path from ProjectDirectory, falling back to filename only.
+    /// </summary>
+    private string GetRelativePath(string filePath)
+    {
+        try
+        {
+            if (!string.IsNullOrEmpty(ProjectDirectory) && filePath.StartsWith(ProjectDirectory, StringComparison.OrdinalIgnoreCase))
+            {
+                var relative = Path.GetRelativePath(ProjectDirectory, filePath);
+                if (!string.IsNullOrEmpty(relative) && relative != ".")
+                    return relative;
+            }
+            
+            // Try going up one level (solution root is often one level above test project)
+            var parentDir = Path.GetDirectoryName(ProjectDirectory);
+            if (!string.IsNullOrEmpty(parentDir) && filePath.StartsWith(parentDir, StringComparison.OrdinalIgnoreCase))
+            {
+                var relative = Path.GetRelativePath(parentDir, filePath);
+                if (!string.IsNullOrEmpty(relative) && relative != ".")
+                    return relative;
+            }
+        }
+        catch
+        {
+            // Fall through to filename
+        }
+        
+        return Path.GetFileName(filePath);
     }
 }

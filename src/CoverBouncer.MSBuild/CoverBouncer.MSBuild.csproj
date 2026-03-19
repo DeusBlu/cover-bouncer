@@ -7,7 +7,7 @@
     
     <!-- NuGet Package Settings -->
     <PackageId>CoverBouncer.MSBuild</PackageId>
-    <Version>1.0.0-preview.9</Version>
+    <Version>1.0.0-preview.10</Version>
     <Title>CoverBouncer - Profile-Based Coverage Enforcement</Title>
     <Description>MSBuild integration for CoverBouncer. Automatically enforces profile-based code coverage policies during dotnet test. Tag your files, set thresholds, and let the bouncer keep your coverage standards high.</Description>
     <PackageTags>coverage;testing;dotnet;csharp;quality;policy;msbuild;coverlet;test-coverage</PackageTags>
@@ -16,7 +16,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryUrl>https://github.com/DeusBlu/cover-bouncer</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageReleaseNotes>Shows uncovered line numbers in violation output (e.g., "Uncovered lines: 12-15, 28, 31-33"). Cleaner MSBuild error output — single consolidated error line instead of repeated [project.csproj] noise.</PackageReleaseNotes>
+    <PackageReleaseNotes>ANSI colorized output for terminal clarity. Compact violation format (actual/required). Relative file paths in error output. Package icon added.</PackageReleaseNotes>
     
     <!-- MSBuild Task Package Settings -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -48,6 +48,9 @@
     
     <!-- Include README -->
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+    
+    <!-- Include icon -->
+    <None Include="..\..\logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

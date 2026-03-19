@@ -52,6 +52,11 @@ fi
 echo "→ Detected version: $VERSION"
 echo ""
 
+# Clean old packages
+echo "→ Cleaning nupkg folder..."
+rm -rf nupkg/*
+echo ""
+
 # Check if packages exist
 if [ ! -f "nupkg/CoverBouncer.MSBuild.$VERSION.nupkg" ]; then
     echo -e "${YELLOW}Warning: MSBuild package not found. Building packages...${NC}"

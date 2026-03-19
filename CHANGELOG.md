@@ -5,6 +5,34 @@ All notable changes to CoverBouncer will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0-preview.10] - 2026-03-19
+
+### Added
+- **ANSI Colorized Terminal Output** 🎨
+  - Profile summaries, violations, and suggestions now render with color in supported terminals.
+  - Semantic color scheme: green for pass, red for fail, yellow for warnings/thresholds, cyan for profile names/headings, gray for secondary info.
+  - Auto-detects terminal support; respects `NO_COLOR` convention and `FORCE_COLOR=1` override.
+  - New `Ansi` static helper class in Core — shared by both MSBuild and CLI.
+
+- **Package Icon** 🖼️
+  - Added `logo.png` as the NuGet package icon for both MSBuild and CLI packages.
+
+### Changed
+- **Compact Violation Format**
+  - Violations now display as `filename: 47.4%/80%` instead of verbose "47.4% coverage (need 32.6% more)".
+  - Easier to scan at a glance.
+
+- **Relative File Paths in MSBuild Errors**
+  - Violation paths are now relative to the project/solution directory instead of absolute.
+  - Falls back to filename-only if relative path can't be computed.
+
+- **Cleaner MSBuild Error Block**
+  - Error output now uses an `Errors:` header with one compact `file: actual/required` line per violation.
+  - Replaces the old pipe-separated single-line summary that was hard to read.
+
+### Tests
+- 6 new Ansi tests (enable/disable, semantic mappings, interpolation, no-escape-when-disabled), bringing total to 119.
+
 ## [1.0.0-preview.9] - 2026-03-04
 
 ### Added
